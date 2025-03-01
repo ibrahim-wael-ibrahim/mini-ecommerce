@@ -5,21 +5,26 @@ import CategoryDetailsPage from "@/pages/CategoryDetailsPage";
 export const revalidate = 360;
 
 export async function generateMetadata({ params, searchParams }) {
-  const { id } = await params;
-  const { lang } = await searchParams;
+  const { id } = params; // params is already an object; no need for await here
+  const { lang } = searchParams;
 
-  // Using HTTPS endpoint
+  // Use HTTPS if supported
   const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
 
   try {
-    const response = await axios.get(apiUrl, {
+    const res = await fetch(apiUrl, {
       headers: {
         "Accept-Language": lang,
       },
-      timeout: 10000, // Increase timeout to 10 seconds
+      // Optionally, you can set a timeout using AbortController if needed
     });
 
-    const category = response.data.data;
+    if (!res.ok) {
+      throw new Error(`Failed to fetch: ${res.status}`);
+    }
+
+    const json = await res.json();
+    const category = json.data;
     const ogImageUrl = fixImageUrl(category.image);
 
     return {

@@ -12,7 +12,7 @@ export default function ProductList({ categoryId }) {
   if (isLoading) return <div>load...</div>;
   console.log(products);
   return (
-    <section className="relative grid grid-cols-1 md:grid-cols-3 justify-items-center w-full  mt-10 mx-auto  ">
+    <section className="relative grid grid-cols-1 md:grid-cols-4 gap-28 justify-items-center w-full mt-20 py-20 mx-auto  ">
       {products &&
         products.length > 0 &&
         products.map((product, index) => (

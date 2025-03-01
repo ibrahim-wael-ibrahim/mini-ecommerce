@@ -11,18 +11,7 @@ export default function HomeDreamSection() {
   return (
     <section className="relative min-h-[70dvh] w-full flex flex-wrap justify-evenly items-center gap-8  ">
       <BlobShape PathSvg="/images/blob/BLOB_1.svg" dirX="left" />
-      {/*<article className="relative flex flex-col justify-center">*/}
-      {/*  <div className="w-[495px] h-[422px] bg-gray-50 dark:bg-customOrangeBg rounded-3xl absolute -left-10 -top-16"></div>*/}
-      {/*  <div className="w-[495px] h-[301px] bg-gray-50 dark:bg-customOrangeBg rounded-3xl absolute top-0 bottom-0 my-auto -right-16"></div>*/}
-      {/*  <div className="w-[495px] h-[301px] bg-customOrange/60 rounded-3xl absolute -bottom-2 left-0 right-0 mx-auto blur-lg"></div>*/}
-      {/*  <Image*/}
-      {/*    src="/images/IMAGE_DREAM.png"*/}
-      {/*    alt="dream image"*/}
-      {/*    width={629}*/}
-      {/*    height={445}*/}
-      {/*    className="z-10 "*/}
-      {/*  />*/}
-      {/*</article>*/}
+
       <ImageShape
         id="dream"
         alt="dream image"
