@@ -18,7 +18,7 @@ export default function CategoryDetailSection({ category }) {
 
   if (!category) {
     return (
-      <div className="min-h-[60dvh]  flex justify-center items-center">
+      <div className="min-h-[60dvh]  flex justify-center items-center ">
         <div role="status">
           <svg
             aria-hidden="true"

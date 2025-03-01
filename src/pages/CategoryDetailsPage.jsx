@@ -6,6 +6,7 @@ import { useCusLocale } from "@/hooks/useCusLocale";
 import { useLanguageRefresh } from "@/hooks/useLanguageRefresh";
 import CategoryDetailSection from "@/components/organisms/CategoryDetailSection";
 import ProductList from "@/components/molecules/ProductList";
+import BlobShape from "@/components/atoms/BlobShape";
 
 function CategoryDetailsPage() {
   const { locale } = useCusLocale();
@@ -60,8 +61,18 @@ function CategoryDetailsPage() {
 
   // Render category details.
   return (
-    <section className="min-h-[80dvh] p-8  my-32 flex flex-col justify-center items-center container mx-auto">
+    <section className="min-h-full p-8  my-36 flex flex-col justify-center items-center container mx-auto">
       <CategoryDetailSection category={category} />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_5.svg"
+        dirX="right"
+        dirY="top-[70rem]"
+      />{" "}
+      <BlobShape
+        PathSvg="/images/blob/BLOB_6.svg"
+        dirX="left"
+        dirY="top-[110rem]"
+      />
       <ProductList categoryId={id} />
     </section>
   );

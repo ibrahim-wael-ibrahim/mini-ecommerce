@@ -54,7 +54,7 @@ export default async function RootLayout({ children }) {
         <Providers>
           <NextIntlClientProvider messages={messages}>
             <Navbar />
-            <main className="relative min-h-dvh w-full  ">{children}</main>
+            <main className="relative min-h-dvh w-full   ">{children}</main>
             <Footer />
           </NextIntlClientProvider>
         </Providers>

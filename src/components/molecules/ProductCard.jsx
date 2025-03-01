@@ -14,7 +14,7 @@ export default function ProductCard({ product }) {
     product.discount_Price,
   );
   return (
-    <Link href={`/product/${product.id}`}>
+    <Link href={`/product/${product.id}?lang=${locale}`}>
       <article className="relative w-[268px] h-[441px] flex items-start justify-center flex-col rounded-2xl  ">
         <div className=" relative min-h-[268px] min-w-full  bg-customLightBg dark:bg-customOrangeBg rounded-t-3xl flex justify-center items-center  ">
           {parseFloat(product.discount) > 0 && (
@@ -47,14 +47,14 @@ export default function ProductCard({ product }) {
               ) : (
                 <div className="flex flex-col justify-end items-start ">
                   <span className="font-extrabold text-md opacity-60 flex justify-center items-start gap-2">
+                    <span className="relative text-lg -top-1">{priceSy}</span>
+                    <span className="line-through">{priceVal}</span>
+                  </span>
+                  <span className="font-extrabold text-2xl flex justify-center items-start gap-2">
                     <span className="relative text-lg -top-1">
                       {discountSy}
                     </span>
-                    <span className="line-through">{discountVal}</span>
-                  </span>
-                  <span className="font-extrabold text-2xl flex justify-center items-start gap-2">
-                    <span className="relative text-lg -top-1">{priceSy}</span>
-                    <span className="">{priceVal}</span>
+                    <span className="">{discountVal}</span>
                   </span>
                 </div>
               )}
