@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    @apply bg-white text-black dark:bg-[#0B0C0C] dark:text-white rtl:font-cairo ltr:font-gilroy;
+}
+
+::-webkit-scrollbar {
+    @apply w-0.5  ;
+}
+
+
+::-webkit-scrollbar-thumb {
+    @apply bg-customOrange;
+}
+
+.hero-container {
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0) 99%);
+}
+

@@ -1,0 +1,1743 @@
+prompt
+----------------------
+I have a project built with Next.js v15 using TailwindCSS, Redux, RTK, react-hook-form, next-intl, and react-icons.
+ I will provide the documentation, file structure, code, and configuration when I say 'I need help for'.
+ When you see that phrase, please first ensure you fully understand the context, ask any clarifying questions if necessary,
+ and then help me fix the error while preserving my coding style. Follow industry standards including SEO best practices,
+ performance optimization, clean code, and proper error validation.
+ Do not alter my style—only assist with the error resolution and improvements based on the provided details
+________________
+dependencies use
+------------
+    "@reduxjs/toolkit": "^2.6.0",
+    "axios": "^1.8.1",
+    "clsx": "^2.1.1",
+    "next": "15.1.7",
+    "next-intl": "^3.26.5",
+    "next-themes": "^0.4.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.54.2",
+    "react-icons": "^5.5.0",
+    "react-redux": "^9.2.0",
+    "rtl-detect": "^1.1.2"
+___________________
+docs for project
+----------
+Front-End Developer Assessment
+Objective:
+Build a mini e-commerce web application using React.js (or Next.js as a bonus). You will
+demonstrate your skills in creating a clean, modular, and scalable front-end application by
+implementing core features such as product listing, shopping cart
+functionality, localization, theming, and state management. The focus will be on writing clean
+code, following best practices, and delivering a user-friendly and responsive UI.
+Requirements:
+1. Pages & Features
+1.1
+Login & Signup Page
+ Implement Email-Password Authentication.
+ Integrate Google Auth0 for social login
+ Manage authentication state (login-logout) using suitable way to make the
+process work in the right way.
+Collection Folder /Auth
+API Route Name
+Login
+register
+sociallogin
+1.2
+USAGE
+Authenticate the user using email and
+password
+Create new account
+Send Google Access token and receive a user
+login data
+Home Page
+ Design static Elements on the Page, and view the dynamic categories from the
+server Design and implement the Home Page with a combination of static
+elements (based on the provided Figma design) and dynamic categories fetched
+from the server. Ensure the page is visually appealing, responsive, and aligns
+with the Figma design.
+Collection Folder /Category
+API Route Name
+Get category website
+USAGE
+Get the Full Categories List1.3
+Category Details Page
+ Implement the Category Details Page to fetch and display detailed information
+about a specific category, including its products. If using Next.js, leverage
+server components for efficient data fetching and rendering. Ensure the page is
+dynamic, SEO-friendly, and provides a seamless user experience.
+Collection Folder /Category
+API Route Name
+Product Details web
+1.4
+USAGE
+Get Category details by ID
+Product Details Page
+ Implement the Product Details Page to fetch and display detailed information
+about a specific product.
+ Add functionality to implement the add to cart process and use the product data
+to optimize the page for SEO.
+Collection Folder /Product
+API Route Name
+Product Details ( web)
+1.5
+USAGE
+Get product details by ID
+Shopping Cart Page
+ Display the current cart products, and manage the increment, decrement and
+delete actions on every item of the product.
+ Calculate and view the total cart items price.
+ Handle these two Methods of saving the cart:
+1- Authenticated User: Fetch the cart from the server on the website startup,
+and save the latest cart to the server when change.
+2- Unauthenticated User: Do the same Steps but using the local storage
+instead.
+Collection Folder /Cart
+API Route Name
+Get cart items (auth)
+Add item to cart (auth)
+Increase item (auth)
+Decrease item (auth)
+Remove item from cart (auth)
+Destroy Cart (auth)
+USAGE
+Get user cart items
+Add product to the user cart
+Increase item quantity for the item in cart
+Decrease item quantity for the item in cart
+Delete item from the server cart
+Remove all items in cart. (empty the cart)1.6
+Checkout Page
+ Implement these steps to the checkout Page:
+1- Authentication:
+Display a sign-in/sign-up section if the user is not authenticated. Skip this step
+and prevent viewing it if the user is already authenticated. Direct the user to
+the next step once they complete this step.
+2- Order data:
+Add form for this section to make the user add the order data like (billing &
+delivery address).
+3- Payment Methods:
+View Available Payment Methods and allow the user to select one of them to
+proceed to the next step.
+4- Order Summary:
+View the order selected options and data, fetch the invoice summary
+from the server and display it, handle the submission process to submit
+the order, and handle the Payment Process using the session URL.
+Collection Folder /Orders
+API Route Name
+Order Price (auth)
+Create Order (auth)
+USAGE
+Get the total price of the current items in the
+user cart
+Submit the user order and get the payment
+session Url.
+2. Technologies and Implementations Details
+2.1
+UI & Layout
+ Use your preferred tools and libraries (e.g., TailwindCSS, Bootstrap, MUI)
+to match the design elements
+ Create well-coded components for layouts and avoid duplicated code
+blocks by making reusable components
+ Ensure the application is fully responsive and works seamlessly across all
+devices (desktop, tablet, and mobile)2.2
+State Management
+Use a state management library such as (Redux, Zustand) or any other
+Libraries, or use React Context.
+2.3
+Theming
+Implement dark and light themes on your website.
+2.4
+Localization
+Add support for English and Arabic, re-fetch the server data on language
+change and view the correct language data in your page by sending the
+language in the headers explained in the postman collection.
+You can use library like react-i18next
+2.5
+Data Fetching
+Use a global fetching method by using your Own Fetching Hook or using
+library like (Axios), And implement Data Caching using (Tanstack
+useQuery, RTK) as a bonus.
+2.6
+Hooks & Utils
+Place your reusable hooks and functions in the hooks folder. Avoid
+duplicating functions—use the required hook instead.
+2.7
+Form Handling
+Implement robust form handling with real-time validation and error
+messages, and consider using libraries like (Formik, React Hook Form)
+for simplified state management and reusable components.
+3. Code Quality Expectations
+ Clean Code: Follow best practices to use the react hooks, and building
+reusable and scalable components.
+ Meaningful Naming: Use descriptive variable, function, and components
+names.
+ Well-Organized Structure: Maintain a clear folder structure4. Submission Requirements:
+ Host your website on a free hosting platform like (Vercel,GH Pages)
+ Add your code to a repo and provide the repo link.
+5. Assessment Resources and Links
+ Figma Link : Click to View
+
+ Postman Collection: in the Assessment Folder.
+______________
+file structure
+----------------
+ tree src                                                                                                                      11:02:10 AM
+├── app
+│         ├── Cart
+│   ├── category
+│   │   └── [id]
+│   │       ├── CategoryDetailsPage.jsx
+│   │       └── page.jsx
+│   ├── Checkout
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.js
+│   ├── Login
+│   ├── page.js
+│   ├── Product
+│   ├── Providers.jsx
+│   └── Signup
+├── components
+│   ├── atoms
+│   │   ├── BlobShape.jsx
+│   │   ├── BurgerMenu.jsx
+│   │   ├── ImageShape.jsx
+│   │   ├── LocaleSwitch.jsx
+│   │   ├── MoreInfo.jsx
+│   │   └── ThemeSwitch.jsx
+│   ├── molecules
+│   │   ├── CategoryCard.jsx
+│   │   ├── FeatureCard.jsx
+│   │   ├── Footer.jsx
+│   │   └── Navbar.jsx
+│   ├── organisms
+│   │   ├── CategoryDetailSection.jsx
+│   │   ├── HeroSection.jsx
+│   │   ├── HomeDreamSection.jsx
+│   │   ├── HomeFeaturesSection.jsx
+│   │   └── HomeOurCategories.jsx
+│   └── skeletion
+│       └── CategoryCardSkeleton.jsx
+├── features
+│   ├── auth
+│   ├── cart
+│   ├── categories
+│   └── products
+├── hooks
+│   ├── useCusLocale.js
+│   └── useThemeSwitch.js
+├── i18n
+│   ├── locales
+│   │   ├── ar
+│   │   │   ├── categories.json
+│   │   │   ├── home.json
+│   │   │   └── molecules.json
+│   │   └── en
+│   │       ├── categories.json
+│   │       ├── home.json
+│   │       └── molecules.json
+│   └── request.js
+├── store
+│   ├── api
+│   │   ├── categoryApi.js
+│   │   └── productApi.js
+│   ├── index.js
+│   ├── services
+│   │   └── api.js
+│   └── Slices
+│       ├── categorySlice.js
+│       ├── localeSlice.js
+│       └── productSlice.js
+└── utils
+    └── fixImageUrl.js
+
+29 directories, 40 files
+
+________________________________________
+======= Appending src file contents =======
+
+File: src/app/layout.js
+------------------------
+import { Geist_Mono, Cairo } from "next/font/google";
+import localFont from "next/font/local";
+import "./globals.css";
+import { Providers } from "@/app/Providers";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getLocale } from "next-intl/server";
+import { getLangDir } from "rtl-detect";
+import Navbar from "@/components/molecules/Navbar";
+import Footer from "@/components/molecules/Footer";
+
+const gilroy = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Gilroy-ExtraBold.otf",
+      weight: "800",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Gilroy-Light.otf",
+      weight: "300",
+      style: "normal",
+    },
+  ],
+  variable: "--font-gilroy", // CSS variable name
+});
+const agency = localFont({
+  src: [{ path: "../../public/fonts/Agency.ttf" }],
+  variable: "--font-agency", // CSS variable name
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+const cairo = Cairo({
+  // Define Cairo font
+  variable: "--font-cairo",
+  subsets: ["latin"], // Specify subsets based on your needs <button class="citation-flag" data-index="8">
+});
+export const metadata = {
+  title: "Create Next App",
+  description: "Generated by create next app",
+};
+
+export default async function RootLayout({ children }) {
+  const messages = await getMessages();
+  const locale = await getLocale();
+  const direction = await getLangDir(locale);
+  return (
+    <html lang={locale} dir={direction} suppressHydrationWarning>
+      <body
+        className={`${gilroy.variable} ${agency.variable}  ${geistMono.variable} ${cairo.variable} antialiased overflow-x-hidden`}
+      >
+        <Providers>
+          <NextIntlClientProvider messages={messages}>
+            <Navbar />
+            <main className="relative min-h-dvh w-full  ">{children}</main>
+            <Footer />
+          </NextIntlClientProvider>
+        </Providers>
+      </body>
+    </html>
+  );
+}
+
+__________
+
+File: src/app/page.js
+------------------------
+import HeroSection from "@/components/organisms/HeroSection";
+import HomeOurCategouris from "@/components/organisms/HomeOurCategouris";
+import HomeDreamSection from "@/components/organisms/HomeDreamSection";
+import HomeFeatuersSection from "@/components/organisms/HomeFeatuersSection";
+
+export default function Home() {
+  return (
+    <>
+      <HeroSection />
+      <HomeOurCategouris />
+      <HomeDreamSection />
+      <HomeFeatuersSection />
+    </>
+  );
+}
+
+__________
+
+File: src/app/globals.css
+------------------------
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    @apply bg-white text-black dark:bg-[#0B0C0C] dark:text-white rtl:font-cairo ltr:font-gilroy;
+}
+
+::-webkit-scrollbar {
+    @apply w-0.5  ;
+}
+
+
+::-webkit-scrollbar-thumb {
+    @apply bg-customOrange;
+}
+
+.hero-container {
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0) 99%);
+}
+
+
+__________
+
+File: src/app/Providers.jsx
+------------------------
+// app/providers.tsx
+"use client";
+
+import { ThemeProvider } from "next-themes";
+import { useRef } from "react";
+import { Provider } from "react-redux";
+import { makeStore } from "@/store";
+
+export function Providers({ children }) {
+  const storeRef = useRef(undefined);
+  if (!storeRef.current) {
+    // Create the store_OLD instance the first time this renders
+    storeRef.current = makeStore();
+  }
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <Provider store={storeRef.current}>{children}</Provider>
+    </ThemeProvider>
+  );
+}
+
+__________
+
+File: src/app/category/[id]/page.jsx
+------------------------
+import React from "react";
+import fixImageUrl from "@/utils/fixImageUrl";
+import CategoryDetailsPage from "@/app/category/[id]/CategoryDetailsPage";
+
+export const revalidate = 360;
+
+export async function generateMetadata({ params, searchParams }) {
+  // Ensure dynamic params are awaited
+  const { id } = await params;
+  const { lang } = await searchParams;
+  const acceptLanguage = lang || "en";
+
+  // Use the proper API URL. Adjust to HTTPS and use the correct host.
+  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
+
+  try {
+    const res = await fetch(apiUrl, {
+      headers: {
+        "Accept-Language": acceptLanguage,
+      },
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to fetch metadata: ${res.status} - ${text}`);
+    }
+
+    const json = await res.json();
+    const category = json.data;
+    const ogImageUrl = fixImageUrl(category.image);
+
+    return {
+      title: category.title,
+      description: category.description,
+      openGraph: {
+        title: category.title,
+        description: category.description,
+        images: [ogImageUrl],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: category.title,
+        description: category.description,
+        images: [ogImageUrl],
+      },
+    };
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+    return {
+      title: "Category",
+      description: "Default category description",
+    };
+  }
+}
+
+export default function Page({ params }) {
+  return <CategoryDetailsPage params={params} />;
+}
+
+__________
+
+File: src/app/category/[id]/CategoryDetailsPage.jsx
+------------------------
+"use client";
+import React, { memo, useEffect, useCallback, useMemo } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useGetCategoryByIdQuery } from "@/store/api/categoryApi";
+import { useGetProductsByCategoryQuery } from "@/store/api/productApi";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import CategoryDetailSection from "@/components/organisms/CategoryDetailSection";
+
+function CategoryDetailsPage() {
+  const { locale } = useCusLocale();
+  const router = useRouter();
+  const { id } = useParams();
+  const searchParams = useSearchParams();
+  const currentLang = searchParams.get("lang") || "en";
+
+  const {
+    data: category,
+    isLoading,
+    error,
+  } = useGetCategoryByIdQuery({ id, locale });
+
+  const refreshRoute = useCallback(() => {
+    router.replace(`/category/${id}?lang=${locale}`);
+  }, [id, locale, router]);
+
+  useEffect(() => {
+    if (currentLang !== locale) {
+      refreshRoute();
+      router.refresh();
+    }
+  }, [currentLang, locale, refreshRoute]);
+
+  // Instead of early returns, determine the content conditionally inside a memoized value
+  const content = useMemo(() => {
+    if (isLoading) {
+      return <p>Loading...</p>;
+    }
+    if (error) {
+      return <p>Error fetching category details</p>;
+    }
+    if (!category) {
+      return <p>No category data found</p>;
+    }
+    return (
+      <section className="min-h-[80dvh] p-8 mx-10 my-20 flex flex-col justify-center items-center">
+        <CategoryDetailSection category={category} />
+      </section>
+    );
+  }, [isLoading, error, category]);
+
+  return content;
+}
+
+export default memo(CategoryDetailsPage);
+
+__________
+
+File: src/components/atoms/ThemeSwitch.jsx
+------------------------
+// ThemeSwitch.js
+"use client";
+import { IoSunny, IoMoon } from "react-icons/io5";
+import { useThemeSwitch } from "@/hooks/useThemeSwitch";
+import Image from "next/image";
+
+export default function ThemeSwitch() {
+  const { isMounted, resolvedTheme, toggleTheme } = useThemeSwitch();
+
+  // Loading state while waiting for hydration
+  if (!isMounted) {
+    return (
+      <div className="h-8 bg-gray-200  dark:bg-gray-700 w-8 rounded-lg"></div>
+    );
+  }
+
+  // Render the appropriate icon based on the current theme
+  if (resolvedTheme === "dark") {
+    return (
+      <IoSunny
+        size={24}
+        className="text-customOrange hidden md:block cursor-pointer"
+        onClick={toggleTheme}
+        title="Switch to Light Mode"
+      />
+    );
+  }
+
+  if (resolvedTheme === "light") {
+    return (
+      <IoMoon
+        size={24}
+        className="hidden md:block cursor-pointer"
+        onClick={toggleTheme}
+        title="Switch to Dark Mode"
+      />
+    );
+  }
+
+  return null; // Fallback in case resolvedTheme is undefined
+}
+
+__________
+
+File: src/components/atoms/LocaleSwitch.jsx
+------------------------
+"use client";
+import { useState, useEffect } from "react";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import Image from "next/image";
+
+export default function LocaleSwitch() {
+  const [mounted, setMounted] = useState(false);
+  const { locale, updateLocale } = useCusLocale();
+
+  // Ensure hydration is complete before rendering
+  useEffect(() => setMounted(true), []);
+  if (!mounted) {
+    return (
+      <div className="h-8 bg-gray-200 dark:bg-gray-700 w-12 rounded-lg"></div>
+    );
+  }
+
+  // Toggle between 'ar' and 'en'
+  const targetLocale = locale === "ar" ? "en" : "ar";
+  const iconPath = `/images/${targetLocale.toUpperCase()}_ICON.svg`;
+
+  return (
+    <button
+      onClick={() => updateLocale(targetLocale)}
+      className="hidden md:flex items-center gap-2 p-2 rounded"
+    >
+      <Image
+        src={iconPath}
+        alt={`${targetLocale.toUpperCase()} Language`}
+        width={24}
+        height={24}
+      />
+      <span>{targetLocale.toUpperCase()}</span>
+    </button>
+  );
+}
+
+__________
+
+File: src/components/atoms/BurgerMenu.jsx
+------------------------
+"use client";
+
+import { useState } from "react";
+import { TiThMenu } from "react-icons/ti";
+import { HiX } from "react-icons/hi";
+import { IoSunny, IoMoon } from "react-icons/io5";
+import { FaCheck } from "react-icons/fa6";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import { useThemeSwitch } from "@/hooks/useThemeSwitch";
+import Image from "next/image";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+
+export default function BurgerMenu() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { locale, updateLocale } = useCusLocale();
+  const { isMounted, resolvedTheme, toggleTheme } = useThemeSwitch();
+  const t = useTranslations("molecules");
+  const pathname = usePathname();
+
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  // Navigation links with translation keys
+  const navLinks = [
+    { url: "/", key: "navbar.links.home" },
+    { url: "/shop", key: "navbar.links.shop" },
+  ];
+
+  const languages = [
+    { code: "ar", label: "AR", icon: "/images/AR_ICON.svg" },
+    { code: "en", label: "EN", icon: "/images/EN_ICON.svg" },
+  ];
+
+  return (
+    <div className="relative flex justify-between items-center md:hidden">
+      <button onClick={toggleMenu} className="md:hidden z-30 mr-5">
+        {isMenuOpen ? (
+          <HiX color="#E58411" size={24} />
+        ) : (
+          <TiThMenu color="#E58411" size={24} />
+        )}
+      </button>
+      <div
+        className={`absolute -top-9 m-auto ltr:-right-[calc(100%)] rtl:-left-[calc(100%)] ${
+          isMenuOpen ? "w-[103vw]" : "w-0"
+        } min-h-screen transition-[width] duration-500 ease-in-out z-20 bg-white dark:bg-black text-black dark:text-white overflow-hidden`}
+      >
+        {isMenuOpen && (
+          <div className="flex flex-col p-10">
+            {/* Logo */}
+            <span className="font-agency uppercase font-bold text-2xl mb-10">
+              {t("navbar.logo")}
+            </span>
+
+            {/* Navigation Links */}
+            <nav className="mb-10">
+              <span className="font-extrabold text-3xl mb-4 block">
+                {t("burgerMenu.menu")}
+              </span>
+              <ul className="text-xl space-y-4">
+                {navLinks.map(({ url, key }) => (
+                  <li
+                    key={url}
+                    className="border-b-2 px-6 py-4 flex items-center justify-start gap-2"
+                  >
+                    {pathname === url && <FaCheck color="#E58411" size={16} />}
+                    <Link href={url}>{t(key)}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            {/* Language Section */}
+            <section className="mb-10">
+              <span className="text-3xl mb-4 block">
+                {t("burgerMenu.language")}
+              </span>
+              <ul className="text-xl space-y-4">
+                {languages.map(({ code, label, icon }) => (
+                  <li
+                    key={code}
+                    className="border-b-2 px-6 py-4 flex items-center justify-start gap-2"
+                  >
+                    {locale === code && <FaCheck color="#E58411" size={16} />}
+                    <button
+                      onClick={() => updateLocale(code)}
+                      className="flex items-center gap-2 p-2 rounded"
+                    >
+                      <Image
+                        src={icon}
+                        alt={`${label} Language`}
+                        width={24}
+                        height={24}
+                      />
+                      <span>{label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Theme Section */}
+            <section>
+              <span className="text-3xl mb-4 block">
+                {t("burgerMenu.themes.head")}
+              </span>
+              <ul className="text-xl space-y-4">
+                <li className="border-b-2 px-6 py-4 flex items-center justify-start gap-2">
+                  {resolvedTheme === "light" && (
+                    <FaCheck color="#E58411" size={16} />
+                  )}
+                  <button
+                    onClick={() => resolvedTheme !== "light" && toggleTheme()}
+                    className="flex items-center gap-2 p-2 rounded"
+                  >
+                    <IoSunny
+                      size={24}
+                      className="text-customOrange cursor-pointer"
+                      title={t("burgerMenu.themes.lightMode")}
+                    />
+                    <span>{t("burgerMenu.themes.lightMode")}</span>
+                  </button>
+                </li>
+                <li className="border-b-2 px-6 py-4 flex items-center justify-start gap-2">
+                  {resolvedTheme === "dark" && (
+                    <FaCheck color="#E58411" size={16} />
+                  )}
+                  <button
+                    onClick={() => resolvedTheme !== "dark" && toggleTheme()}
+                    className="flex items-center gap-2 p-2 rounded"
+                  >
+                    <IoMoon
+                      size={24}
+                      className="cursor-pointer"
+                      title={t("burgerMenu.themes.darkMode")}
+                    />
+                    <span>{t("burgerMenu.themes.darkMode")}</span>
+                  </button>
+                </li>
+              </ul>
+            </section>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+__________
+
+File: src/components/atoms/MoreInfo.jsx
+------------------------
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { HiArrowLongRight } from "react-icons/hi2";
+
+export default function MoreInfo({ link }) {
+  const t = useTranslations("molecules");
+  return (
+    <Link
+      href={link}
+      className="text-customOrange capitalize flex  items-center gap-4"
+    >
+      {t("moreInfo")}{" "}
+      <span>
+        {" "}
+        <HiArrowLongRight size={20} className="rtl:rotate-180" />
+      </span>
+    </Link>
+  );
+}
+
+__________
+
+File: src/components/atoms/BlobShape.jsx
+------------------------
+import Image from "next/image";
+
+export default function BlobShape({
+  PathSvg,
+  dirY = "top-20",
+  dirX = "left",
+  className,
+}) {
+  return (
+    <div className={`absolute ${dirY} ${dirX}-0 w-[330px] ${className}`}>
+      <Image
+        src={PathSvg}
+        width={0}
+        height={0}
+        style={{ width: "auto", height: "auto" }}
+        alt="BlobShape"
+        className={`absolute z-0 opacity-60 top-0 bottom-0 my-auto ${dirX}-0 scale-110`}
+      />
+      <Image
+        src={PathSvg}
+        width={0}
+        height={0}
+        style={{ width: "auto", height: "auto" }}
+        alt="BlobShape"
+        className={`absolute top-0 bottom-0 my-auto ${dirX}-0`}
+      />
+    </div>
+  );
+}
+
+__________
+
+File: src/components/atoms/ImageShape.jsx
+------------------------
+import Image from "next/image";
+import React from "react";
+
+export default function ImageShape({ id, alt, image }) {
+  return (
+    <article
+      className="relative  flex flex-col  justify-center w-[408px] h-[303px] md:w-[728px] md:h-[541px] p-8"
+      id={id}
+    >
+      <div className="w-[277px] md:w-[495px] h-[236px] md:h-[422px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl absolute md:-left-10 md:-top-16 -left-4 -top-4" />
+      <div className="w-[277px] md:w-[495px] h-[169px] md:h-[301px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl absolute md:top-0 md:bottom-0 my-auto md:-right-16 -right-4" />
+      <div className="relative  aspect-video flex flex-col w-full h-full p-4 overflow-hidden  rounded-2xl ">
+        <Image
+          src={image}
+          alt={alt}
+          width={0}
+          height={0}
+          fill
+          sizes="auto"
+          style={{ width: "100%", height: "100%" }}
+          quality="100"
+          className="absolute z-10  object-center object-cover  "
+          priority
+        />
+      </div>
+    </article>
+  );
+}
+
+__________
+
+File: src/components/molecules/Navbar.jsx
+------------------------
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { BsHandbagFill } from "react-icons/bs";
+import { CgSearch } from "react-icons/cg";
+import ThemeSwitch from "@/components/atoms/ThemeSwitch";
+import LocaleSwitch from "@/components/atoms/LocaleSwitch";
+import { useTranslations } from "next-intl";
+import BurgerMenu from "@/components/atoms/BurgerMenu";
+
+const navLinks = [
+  { url: "/", label: "home" },
+  { url: "/shop", label: "shop" },
+];
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const t = useTranslations("molecules");
+
+  return (
+    <div
+      className={`absolute inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
+    >
+      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14 ">
+        <span className="flex  font-agency uppercase font-bold text-2xl">
+          {t("navbar.logo")}
+        </span>
+        <nav className=" items-center justify-between sm:mt-0 gap-4 hidden md:flex ">
+          {navLinks.map((link) => (
+            <Link
+              key={link.url}
+              href={link.url}
+              className={`capitalize px-4  transition-colors duration-200 ${
+                pathname === link.url
+                  ? "font-extrabold "
+                  : " hover:font-extrabold"
+              }`}
+            >
+              {t(`navbar.links.${link.label}`)}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex  gap-6 items-center justify-between">
+          <CgSearch size={24} className="md:text-white text-customOrange" />
+          <span className="relative ">
+            <BsHandbagFill size={24} />
+            <span className="absolute -top-0 -right-1  w-3.5 aspect-square bg-customOrange contain-none rounded-full"></span>
+          </span>
+          <ThemeSwitch />
+          <LocaleSwitch className="hidden md:block" />
+          <BurgerMenu />
+        </div>
+      </header>
+    </div>
+  );
+}
+
+__________
+
+File: src/components/molecules/CategoryCard.jsx
+------------------------
+// src/components/molecules/CategoryCard.jsx
+import Image from "next/image";
+import MoreInfo from "@/components/atoms/MoreInfo";
+
+export default function CategoryCard({ image, title, description, id, link }) {
+  return (
+    <article
+      id={id}
+      className="flex flex-col justify-between items-start w-[284px] h-[478px] "
+    >
+      <div className="w-[277px] h-[267px] overflow-hidden rounded-2xl">
+        <Image
+          src={image}
+          alt={title}
+          width={277}
+          height={267}
+          style={{ width: "100%", height: "100%" }}
+          quality="100"
+          priority
+        />
+      </div>
+      <h2 className="mt-4 text-2xl font-bold">{title}</h2>
+      <p className="mb-auto mt-8 max-h-[3ch] flex justify-start items-start opacity-40 line-clamp-3">
+        {description}
+      </p>
+      <MoreInfo link={link} />
+    </article>
+  );
+}
+
+__________
+
+File: src/components/molecules/FeatureCard.jsx
+------------------------
+import Image from "next/image";
+
+export default function FeatureCard({ image, id, title, description }) {
+  return (
+    <article
+      className="relative w-[370px] h-[506px] flex justify-center items-end "
+      id={id}
+    >
+      <Image
+        src={image}
+        alt={title}
+        className="absolute z-10"
+        width={370}
+        height={476}
+        style={{ height: "auto", width: "auto" }}
+      />
+      <Image
+        src={image}
+        alt={title}
+        className="absolute bottom-0 left-0 right-0 mx-auto -z-0 blur-3xl opacity-60"
+        width={300}
+        height={380}
+        style={{ height: "auto", width: "auto" }}
+      />
+      <div className="w-[334px] h-[239px] relative flex flex-col justify-center items-center my-4 z-10">
+        <div className="relative">
+          <div className="absolute -bottom-0 -left-24 h-1.5 w-24 rounded-br-lg bg-transparent shadow-[0.5rem_0_0_0] shadow-white/70 backdrop-blur-sm "></div>
+          <div className="z-10 bg-white/70 backdrop-blur-sm  w-[78px] h-[39px] rounded-[39px_39px_0_0] relative"></div>
+          <div className="absolute -bottom-0 -right-24 h-1.5 w-24 rounded-bl-lg shadow-[-0.5rem_0_0_0] shadow-white/70 backdrop-blur-sm"></div>
+        </div>
+        <div className="relative flex flex-col items-center justify-center w-full h-full bg-white/70 rounded-2xl backdrop-blur-sm p-4 text-black">
+          <h2 className="text-2xl font-extrabold">{title}</h2>
+          <p className="mt-2 text-base text-center">{description}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+__________
+
+File: src/components/molecules/Footer.jsx
+------------------------
+import { FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
+
+export default function Footer() {
+  return (
+    <footer className="relative mt-6  w-full bg-customLightBg dark:bg-customOrangeBg flex flex-col flex-wrap justify-between items-center py-10 px-32 gap-12">
+      <article className="relative min-h-8/12 w-8/12 flex   justify-between items-center gap-8 py-20 ">
+        <div className="flex flex-col justify-center items-start gap-8">
+          <h1 className=" font-extrabold text-2xl">LOGO</h1>
+          <p className="w-[293px] text-[15px] font-normal">
+            The advantage of hiring a workspace with us is that givees you
+            comfortable service and all-around facilities.
+          </p>
+        </div>
+        <div className="flex flex-col justify-center items-start gap-4">
+          <h1 className="font-bold capitalize text-customOrange">Services</h1>
+          <span>Email Marketing</span>
+          <span>Campaigns</span>
+          <span>Branding</span>
+        </div>
+        <div className="flex flex-col justify-center items-start gap-4">
+          <h1 className="font-bold capitalize text-customOrange">Furniture</h1>
+          <span>Beds</span>
+          <span>Chair</span>
+          <span>All</span>
+        </div>
+        <div className="flex flex-col justify-center items-start gap-4">
+          <h1 className="font-bold capitalize text-customOrange">Follow US</h1>
+          <div className="flex items-center gap-4">
+            <FaFacebookF />
+            <span>Facebook</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <FaTwitter />
+            <span>Twitter</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <FaInstagram />
+            <span>Instagram</span>
+          </div>
+        </div>
+      </article>
+      <article className="relative w-8/12  flex  flex-wrap justify-between items-center gap-8 ">
+        <div>Copyright&copy;2021</div>
+        <div className="flex  justify-center items-center gap-12">
+          <span>terms & Conditions</span> <span>Privacy Policy</span>
+        </div>
+      </article>
+    </footer>
+  );
+}
+
+__________
+
+File: src/components/organisms/HeroSection.jsx
+------------------------
+import { BiSearchAlt } from "react-icons/bi";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
+
+export default function HeroSection() {
+  const t = useTranslations("home");
+  return (
+    <section className="relative flex flex-col justify-center items-center gap-4 min-h-dvh w-full bg-[url(../../public/images/HERO_SECTION_PHONE.png)] md:bg-[url(../../public/images/HERO_SECTION.png)] hero-container bg-no-repeat  bg-cover md:bg-current bg-fixed">
+      <h1 className="text-[36px] md:w-[950px] px-6  md:text-[80px] text-center capitalize   font-extrabold  text-white  ">
+        {t("heroSection.title")}
+      </h1>
+      <p className="text-white/60 text-center font-extrabold  text-xl md:text-2xl my-6 text-wrap px-6 mb-60 md:mb-0  md:w-[650px]">
+        {t("heroSection.description")}
+      </p>
+      <div className="relative w-[300px] hidden md:block  ">
+        <input
+          type="text"
+          className="w-[300px] h-[40px] pl-4 pr-10 text-sm text-white bg-white/10 bg-opacity-50 backdrop-blur-sm  rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
+          placeholder={t("heroSection.searchPlaceholder")}
+          id="search"
+        />
+        <button
+          type="submit"
+          className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white"
+        >
+          <BiSearchAlt size={24} />
+        </button>
+      </div>
+    </section>
+  );
+}
+
+__________
+
+File: src/components/organisms/HomeOurCategories.jsx
+------------------------
+"use client";
+import React from "react";
+import CategoryCard from "@/components/molecules/CategoryCard";
+import { useTranslations } from "next-intl";
+import { useGetCategoriesQuery } from "@/store/api/categoryApi";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import CategoryCardSkeleton from "@/components/skeletion/CategoryCardSkeleton";
+
+export default function HomeOurCategouris() {
+  const t = useTranslations("home");
+  const { locale } = useCusLocale();
+
+  const { data: categories, isLoading, error } = useGetCategoriesQuery(locale);
+
+  return (
+    <section className="relative min-h-[80dvh] w-full flex flex-wrap justify-evenly items-end gap-8 p-24">
+      <h1 className="text-5xl font-extrabold mb-20">
+        {t("ourCategories.title")
+          .split("\n")
+          .map((line, index, arr) => (
+            <React.Fragment key={index}>
+              {line}
+              {index < arr.length - 1 && <br />}
+            </React.Fragment>
+          ))}
+      </h1>
+      {isLoading ? (
+        <CategoryCardSkeleton />
+      ) : error ? (
+        <div>error</div>
+      ) : (
+        categories.map((category) => (
+          <CategoryCard
+            key={category.id}
+            image={category.image}
+            title={category.title}
+            description={category.description}
+            link={`/category/${category.id}?lang=${locale}`}
+          />
+        ))
+      )}
+    </section>
+  );
+}
+
+__________
+
+File: src/components/organisms/HomeDreamSection.jsx
+------------------------
+import Image from "next/image";
+import MoreInfo from "@/components/atoms/MoreInfo";
+import BlobShape from "@/components/atoms/BlobShape";
+import { useTranslations } from "next-intl";
+import React from "react";
+import ImageShape from "@/components/atoms/ImageShape";
+
+export default function HomeDreamSection() {
+  const t = useTranslations("home");
+
+  return (
+    <section className="relative min-h-[70dvh] w-full flex flex-wrap justify-evenly items-center gap-8  ">
+      <BlobShape PathSvg="/images/blob/BLOB_1.svg" dirX="left" />
+      {/*<article className="relative flex flex-col justify-center">*/}
+      {/*  <div className="w-[495px] h-[422px] bg-gray-50 dark:bg-customOrangeBg rounded-3xl absolute -left-10 -top-16"></div>*/}
+      {/*  <div className="w-[495px] h-[301px] bg-gray-50 dark:bg-customOrangeBg rounded-3xl absolute top-0 bottom-0 my-auto -right-16"></div>*/}
+      {/*  <div className="w-[495px] h-[301px] bg-customOrange/60 rounded-3xl absolute -bottom-2 left-0 right-0 mx-auto blur-lg"></div>*/}
+      {/*  <Image*/}
+      {/*    src="/images/IMAGE_DREAM.png"*/}
+      {/*    alt="dream image"*/}
+      {/*    width={629}*/}
+      {/*    height={445}*/}
+      {/*    className="z-10 "*/}
+      {/*  />*/}
+      {/*</article>*/}
+      <ImageShape
+        id="dream"
+        alt="dream image"
+        image="/images/IMAGE_DREAM.png"
+      />
+      <article className="relative flex flex-col justify-center items-start gap-8">
+        <h1 className="text-5xl font-extrabold  mb-4">
+          {t("dreamSection.title")
+            .split("\n")
+            .map((line, index, arr) => (
+              <React.Fragment key={index}>
+                {line}
+                {index < arr.length - 1 && <br />}
+              </React.Fragment>
+            ))}
+        </h1>
+        <p className="w-[500px] opacity-60">{t("dreamSection.description")}</p>
+        <MoreInfo link="test" />
+      </article>
+    </section>
+  );
+}
+
+__________
+
+File: src/components/organisms/HomeFeaturesSection.jsx
+------------------------
+import FeatureCard from "@/components/molecules/FeatureCard";
+import BlobShape from "@/components/atoms/BlobShape";
+import React from "react";
+
+const features = [
+  {
+    id: 1,
+    title: "Extensive Catalog",
+    description:
+      "A wide selection of furniture styles, categories, and price points.",
+    image: "/images/feature/FEATURE_ONE.png",
+    link: "/features_OLD/catalog",
+  },
+  {
+    id: 2,
+    title: "Detailed Product Descriptions",
+    description:
+      "Comprehensive information including dimensions, materials, care instructions, and warranty details.",
+    image: "/images/feature/FEATURE_TWO.png",
+    link: "/features_OLD/descriptions",
+  },
+  {
+    id: 3,
+    title: "Room Planner/Visualizer",
+    description:
+      "Tools to help customers visualize furniture in their own spaces.",
+    image: "/images/feature/FEATURE_THREE.png",
+    link: "/features_OLD/visualizer",
+  },
+];
+
+export default function HomeFeatuersSection() {
+  return (
+    <section className="relative min-h-[70dvh]  w-full flex flex-col  justify-center items-center gap-8 py-20 mt-60 mb-80 bg-customLightBg dark:bg-customOrangeBg">
+      <BlobShape
+        PathSvg="/images/blob/BLOB_3.svg"
+        dirX="left"
+        dirY="bottom-0"
+      />
+      <BlobShape PathSvg="/images/blob/BLOB_2.svg" dirX="right" dirY="top-18" />
+      <span className="uppercase text-customOrange text-xl">some of our</span>
+      <h1 className="capitalize text-5xl font-extrabold">
+        Features we offer to you
+      </h1>
+      <div className="relative flex flex-wrap justify-center items-center mt-5 gap-32">
+        {features.map((feature) => (
+          <FeatureCard
+            key={feature.id}
+            image={feature.image}
+            title={feature.title}
+            description={feature.description}
+            link={feature.link}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+__________
+
+File: src/components/organisms/CategoryDetailSection.jsx
+------------------------
+import ImageShape from "@/components/atoms/ImageShape";
+import { useTranslations } from "next-intl";
+import { IoIosArrowForward } from "react-icons/io";
+
+export default function CategoryDetailSection({ category }) {
+  const t = useTranslations("categories");
+  return (
+    <section className="min-h-[60dvh] container flex  flex-col-reverse md:flex-row justify-evenly items-center gap-8">
+      <article className="flex flex-col justify-start items-start gap-8">
+        <div className="capitalize text-customOrange flex justify-start items-center gap-4">
+          <span>{t("categoriesRoute")}</span>
+          <IoIosArrowForward className="rtl:rotate-180" />
+          <span>{category?.title}</span>
+        </div>
+        <h1 className="font-extrabold text-3xl">
+          {t("allCategory") + " " + category?.title}
+        </h1>
+        <p className="w-8/12">{category?.description}</p>
+      </article>
+      <ImageShape
+        image={category.image}
+        id={category.id}
+        alt={category.title}
+      />
+    </section>
+  );
+}
+
+__________
+
+File: src/components/skeletion/CategoryCardSkeleton.jsx
+------------------------
+import clsx from "clsx";
+
+const CategoryCardSkeleton = ({ className }) => {
+  return (
+    <div
+      className={clsx(
+        "flex flex-col p-4 bg-white rounded-2xl shadow-md dark:bg-gray-800 dark:shadow-gray-700",
+        "space-y-4 animate-pulse",
+        className,
+      )}
+    >
+      {/* Image Placeholder */}
+      <div className="h-48 bg-slate-200 dark:bg-slate-700 rounded-2xl"></div>
+
+      {/* Title Placeholder */}
+      <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+
+      {/* Description Placeholder */}
+      <div className="space-y-2">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="h-4 bg-slate-200 dark:bg-slate-700 rounded"
+          ></div>
+        ))}
+      </div>
+
+      {/* Action Button Placeholder */}
+      <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+    </div>
+  );
+};
+
+export default CategoryCardSkeleton;
+
+__________
+
+File: src/hooks/useThemeSwitch.js
+------------------------
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+
+export function useThemeSwitch() {
+    const { setTheme, resolvedTheme } = useTheme();
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Ensure hydration is complete before accessing the theme
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Function to toggle the theme
+    const toggleTheme = () => {
+        if (resolvedTheme === 'dark') {
+            setTheme('light');
+        } else {
+            setTheme('dark');
+        }
+    };
+
+    return { isMounted, resolvedTheme, toggleTheme };
+}
+__________
+
+File: src/hooks/useCusLocale.js
+------------------------
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { setLocale } from "@/store/Slices/localeSlice";
+import { getLangDir } from "rtl-detect";
+
+export function useCusLocale() {
+  const dispatch = useDispatch();
+  const locale = useSelector((state) => state.locale.locale);
+  const router = useRouter();
+  const direction = getLangDir(locale);
+
+  // Update locale in Redux and cookie, then refresh the page
+  const updateLocale = (newLocale) => {
+    dispatch(setLocale(newLocale));
+    document.cookie = `NEXTAPP_LOCALE=${newLocale}; path=/;`;
+    router.refresh();
+  };
+
+  // On mount, initialize locale from cookie or browser settings
+  useEffect(() => {
+    const cookieLocale = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("NEXTAPP_LOCALE="))
+      ?.split("=")[1];
+    if (cookieLocale) {
+      dispatch(setLocale(cookieLocale));
+    } else {
+      const browserLocale = navigator.language.slice(0, 2);
+      document.cookie = `NEXTAPP_LOCALE=${browserLocale}; path=/;`;
+      dispatch(setLocale(browserLocale));
+    }
+  }, [dispatch]);
+
+  return { locale, direction, updateLocale };
+}
+
+__________
+
+File: src/utils/fixImageUrl.js
+------------------------
+const fixImageUrl = (image) => {
+  if (image.startsWith("storage"))
+    return `http://test-ecomerce.xn--hrt-w-ova.de/${image}`;
+  if (image.startsWith("http")) return image;
+  return `/images/${image}`;
+};
+export default fixImageUrl;
+
+__________
+
+File: src/i18n/locales/ar/home.json
+------------------------
+{
+  "heroSection": {
+    "title": "اجعل ديكور منزلك أكثر بساطة وعصرية",
+    "description": "حوّل غرفتك مع بانطو إلى مساحة أكثر بساطة وعصرية بسهولة وسرعة",
+    "searchPlaceholder": "بحث"
+  },
+  "ourCategories": {
+    "title": "تصنيفاتنا",
+    "items": {
+      "livingRoom": {
+        "title": "غرفة المعيشة",
+        "description": "أرائك، كنبات صغيرة، كراسي بذراعين، طاولات قهوة، طاولات جانبية، مراكز ترفيه، مكتبات."
+      },
+      "bedroom": {
+        "title": "غرفة النوم",
+        "description": "أسِرَّة، مناضد بجانب السرير، خزائن، أدراج."
+      },
+      "kitchen": {
+        "title": "المطبخ",
+        "description": "خزائن المطبخ، جزر المطبخ، طاولات طعام، كراسي."
+      }
+    }
+  },
+  "dreamSection": {
+    "title": "زين أحلامك،\nاختر بحكمة",
+    "description": "اكتشف أثاثًا عالي الجودة، وتصاميم منسقة، وخدمة استثنائية في متجرنا. نجعل تأثيث منزلك سهلاً وممتعًا."
+  }
+}
+
+__________
+
+File: src/i18n/locales/ar/molecules.json
+------------------------
+{
+  "moreInfo": "المزيد عن",
+  "navbar": {
+    "logo": "الشعار",
+    "links": {
+      "home": "المنزل",
+      "shop": "المتجر"
+    }
+  },
+  "burgerMenu": {
+    "menu": "القائمة",
+    "language": "اللغة",
+    "themes": {
+      "head": "الثيمات",
+      "lightMode": "الوضع الفاتح",
+      "darkMode": "الوضع الداكن"
+    }
+  }
+}
+__________
+
+File: src/i18n/locales/ar/categories.json
+------------------------
+{
+  "categoriesRoute": "التصنيفات",
+  "allCategory": "كل"
+}
+
+__________
+
+File: src/i18n/locales/en/home.json
+------------------------
+{
+  "heroSection": {
+    "title": "Make your interior more minimalistic & modern",
+    "description": "Turn your room with panto into a lot more minimalist and modern with ease and speed",
+    "searchPlaceholder": "Search"
+  },
+  "ourCategories": {
+    "title": "Our\nCategories",
+    "items": {
+      "livingRoom": {
+        "title": "Living Room",
+        "description": "Sofas, loveseats, armchairs, coffee tables, end tables, entertainment centers, bookshelves."
+      },
+      "bedroom": {
+        "title": "Bedroom",
+        "description": "Beds, nightstands, dressers, chests of drawers, wardrobes, vanities."
+      },
+      "kitchen": {
+        "title": "Kitchen",
+        "description": "Kitchen cabinets, kitchen islands, dining tables, chairs."
+      }
+    }
+  },
+  "dreamSection": {
+    "title": "Furnish Your Dreams,\nChoose Wisely",
+    "description": "Discover quality furniture, curated styles, and exceptional service at Our Store. We make furnishing your home easy and enjoyable."
+  }
+}
+
+__________
+
+File: src/i18n/locales/en/molecules.json
+------------------------
+{
+  "moreInfo": "more info",
+  "navbar": {
+    "logo": "Logo",
+    "links": {
+      "home": "Home",
+      "shop": "Shop"
+    }
+  },
+  "burgerMenu": {
+    "menu": "Menu",
+    "language": "Language",
+    "themes": {
+      "head": "themes",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode"
+    }
+  }
+}
+
+__________
+
+File: src/i18n/locales/en/categories.json
+------------------------
+{
+  "categoriesRoute": "categories",
+  "allCategory": "all"
+}
+__________
+
+File: src/i18n/request.js
+------------------------
+import { getRequestConfig } from "next-intl/server";
+import { cookies } from "next/headers";
+
+export default getRequestConfig(async () => {
+  const cookie = await cookies();
+  const locale = cookie.get("NEXTAPP_LOCALE")?.value || "en";
+
+  // Import translations with fallback
+  const [home, molecules, categories] = await Promise.all([
+    import(`./locales/${locale}/home.json`).catch(() => ({ default: {} })),
+    import(`./locales/${locale}/molecules.json`).catch(() => ({ default: {} })),
+    import(`./locales/${locale}/categories.json`).catch(() => ({
+      default: {},
+    })),
+  ]);
+
+  return {
+    locale,
+    messages: {
+      home: home.default,
+      molecules: molecules.default,
+      categories: categories.default,
+    },
+  };
+});
+
+__________
+
+File: src/store/index.js
+------------------------
+import { configureStore } from "@reduxjs/toolkit";
+import { api } from "./services/api";
+import localeReducer from "./Slices/localeSlice";
+import categoryReducer from "./Slices/categorySlice";
+import productReducer from "./Slices/productSlice";
+
+export const makeStore = () => {
+  return configureStore({
+    reducer: {
+      [api.reducerPath]: api.reducer,
+      locale: localeReducer,
+      category: categoryReducer,
+      product: productReducer,
+    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(api.middleware),
+  });
+};
+
+export default makeStore();
+
+__________
+
+File: src/store/services/api.js
+------------------------
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+// Define API base URL
+const baseUrl = "http://test-ecomerce.xn--hrt-w-ova.de/api";
+
+export const api = createApi({
+  reducerPath: "api",
+  baseQuery: fetchBaseQuery({
+    baseUrl,
+    prepareHeaders: (headers, { getState }) => {
+      // const token = getState().auth.token;
+      // if (token) headers.set("Authorization", `Bearer ${token}`)
+      headers.set("Accept", "application/json");
+      headers.set("User-Type", "personal");
+      headers.set("Accept-Language", getState().locale.locale); // 🎯 Get locale from Redux
+      return headers;
+    },
+  }),
+  tagTypes: ["Auth", "Categories", "Products", "Cart", "User"],
+  endpoints: () => ({}),
+});
+
+__________
+
+File: src/store/Slices/localeSlice.js
+------------------------
+import { createSlice } from "@reduxjs/toolkit";
+
+const initialState = {
+  locale: "en", // default locale
+};
+
+const localeSlice = createSlice({
+  name: "locale",
+  initialState,
+  reducers: {
+    setLocale: (state, action) => {
+      state.locale = action.payload;
+    },
+  },
+});
+
+export const { setLocale } = localeSlice.actions;
+export default localeSlice.reducer;
+
+__________
+
+File: src/store/Slices/categorySlice.js
+------------------------
+// src/store/Slices/categorySlice.js
+import { createSlice } from "@reduxjs/toolkit";
+
+const initialState = {
+  selectedCategory: null,
+};
+
+const categorySlice = createSlice({
+  name: "category",
+  initialState,
+  reducers: {
+    setSelectedCategory: (state, action) => {
+      state.selectedCategory = action.payload;
+    },
+  },
+});
+
+export const { setSelectedCategory } = categorySlice.actions;
+export default categorySlice.reducer;
+
+__________
+
+File: src/store/Slices/productSlice.js
+------------------------
+// src/store/Slices/productSlice.js
+import { createSlice } from "@reduxjs/toolkit";
+
+const initialState = {
+  selectedProduct: null,
+};
+
+const productSlice = createSlice({
+  name: "product",
+  initialState,
+  reducers: {
+    setSelectedProduct: (state, action) => {
+      state.selectedProduct = action.payload;
+    },
+  },
+});
+
+export const { setSelectedProduct } = productSlice.actions;
+export default productSlice.reducer;
+
+__________
+
+File: src/store/api/categoryApi.js
+------------------------
+import { api } from "../services/api";
+import fixImageUrl from "@/utils/fixImageUrl";
+
+export const categoryApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    getCategories: builder.query({
+      query: (locale) => "/category/get",
+      transformResponse: (response) => {
+        return response.data.map((category) => ({
+          ...category,
+          image: fixImageUrl(category.image),
+        }));
+      },
+      providesTags: ["Categories"],
+    }),
+    getCategoryById: builder.query({
+      query: ({ id, locale }) => `/category/find/${id}`,
+      transformResponse: (response) => {
+        return {
+          ...response.data,
+          image: fixImageUrl(response.data.image),
+        };
+      },
+      providesTags: ["Categories"],
+    }),
+  }),
+  overrideExisting: false,
+});
+
+export const { useGetCategoriesQuery, useGetCategoryByIdQuery } = categoryApi;
+
+__________
+
+File: src/store/api/productApi.js
+------------------------
+import { api } from "../services/api";
+
+export const productApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    getProductsByCategory: builder.query({
+      query: ({ categoryId, locale }) =>
+        `/product/category?category_id=${categoryId}`,
+      transformResponse: (response) => {
+        return response.data;
+      },
+      providesTags: ["Products"],
+    }),
+    getProductById: builder.query({
+      query: ({ id, locale }) => `/product/find/${id}`,
+      transformResponse: (response) => response.data,
+      providesTags: ["Products"],
+    }),
+  }),
+  overrideExisting: false,
+});
+
+export const { useGetProductsByCategoryQuery, useGetProductByIdQuery } =
+  productApi;
+
+__________
+

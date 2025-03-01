@@ -1,0 +1,19 @@
+{
+  "moreInfo": "المزيد عن",
+  "navbar": {
+    "logo": "الشعار",
+    "links": {
+      "home": "المنزل",
+      "shop": "المتجر"
+    }
+  },
+  "burgerMenu": {
+    "menu": "القائمة",
+    "language": "اللغة",
+    "themes": {
+      "head": "الثيمات",
+      "lightMode": "الوضع الفاتح",
+      "darkMode": "الوضع الداكن"
+    }
+  }
+}

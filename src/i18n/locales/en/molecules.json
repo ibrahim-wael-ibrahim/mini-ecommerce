@@ -1,0 +1,19 @@
+{
+  "moreInfo": "more info",
+  "navbar": {
+    "logo": "Logo",
+    "links": {
+      "home": "Home",
+      "shop": "Shop"
+    }
+  },
+  "burgerMenu": {
+    "menu": "Menu",
+    "language": "Language",
+    "themes": {
+      "head": "themes",
+      "lightMode": "Light Mode",
+      "darkMode": "Dark Mode"
+    }
+  }
+}

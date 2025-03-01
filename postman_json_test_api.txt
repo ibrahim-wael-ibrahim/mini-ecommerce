@@ -1,0 +1,2057 @@
+{
+	"info": {
+		"_postman_id": "71f44cce-1f91-46ef-8dfa-96f13379411a",
+		"name": "chairy-app",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38839688"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "User-Type",
+								"value": "personal",
+								"description": "business || personal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "user_email@example.com",
+									"description": "email|string|unique"
+								},
+								{
+									"key": "password",
+									"value": "admin@123",
+									"description": "requried|string"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "this request return token and user object"
+					},
+					"response": [
+						{
+							"name": "Login",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "User-Type",
+										"value": "personal",
+										"description": "business || personal",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "user_email@example.com",
+											"description": "email|string|unique"
+										},
+										{
+											"key": "password",
+											"value": "admin@123",
+											"description": "requried|string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/login",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:36:43 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "55"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"id\": 16,\n        \"name\": \"first name\",\n        \"description\": null,\n        \"email\": \"user_email@example.com\",\n        \"email_verified_at\": null,\n        \"is_admin\": 0,\n        \"image\": null,\n        \"created_at\": \"2025-02-20T07:43:32.000000Z\",\n        \"updated_at\": \"2025-02-20T07:43:32.000000Z\",\n        \"lastname\": \"last name\",\n        \"is_verfied\": 0,\n        \"socialite_id\": null,\n        \"provider\": null,\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiY2Y4M2JiZDc0MWE2YzBiMWY1OWQxMWJlZTUzY2FlMWQ1MTZhYjg5ODdiNWRmOTc2MzQ3M2Y0MjgzMTRhYzhmNDNlNmU5Mzg1NDZlMWM1YzEiLCJpYXQiOjE3NDAwNjIyMDQuNjU1MzMyLCJuYmYiOjE3NDAwNjIyMDQuNjU1MzM1LCJleHAiOjE3NzE1OTgyMDQuNTc5MzM2LCJzdWIiOiIxNiIsInNjb3BlcyI6W119.QtyZCBNak3wLnR0DzBpSw5o5uL0fxIDu0ac5-gMPUU4bHiQQfc2nGGBd2nMHgQBx2KDc6kwPViZ-RXcebLjPJAsm8iHmbnh-chQdYPAZcMcOcc2AN4iUuoVlrldzBqTlUH1JW4FjuJv7KQNLRU6xJDzvXM_lQ2CV_oEwzNQJJjHLo6SU_VDx7im93ELSF3mHZMAM6-R5LQ6LKZfXf9AAyn05PzWBUoSoX59d-4LxaHa2pGNZXYmFJJ0k2l7GHfz7GiJFUSGUJR35m-yvsCFzMgopipflV1ELaedAjuRJS7wzZUKDnJs3TC3nQmB1isg4WJEZUUT7_GMURPfq8JDmZwr704S7ugic_hCn07at1sSAF03MG93Iam9vxVMuDF-cSnHoD51hzw3KCbB-y4Lv1nl1rl52-aYTWFpBDZNBcAEmTa8wMihW4Q4b_r-1kzYtJMMiWX2y_x0aSgz3OSwPVRLHTyFGiHEAaAiXQ7NenifWqU4la5hIL8OgeY3g4gojEYfNG2KLVuSj1C1ZHnlB9VfEUttHvcuX91soPS647VomxJFJQLh3_ucvhLOsFaWUhGij05d1iKDY04fT2LQrnoI9zXEUwE7aDCnio0yGJEZA7MVFWoZLqxYyK3O_34Kk2HZyzCGUV0JepuQmCHhGkZZZqbR5fO78Glz9pe78zxI\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "User-Type",
+								"value": "personal",
+								"description": "business || personal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "first name",
+									"description": "first name",
+									"type": "text"
+								},
+								{
+									"key": "lastname",
+									"value": "last name",
+									"description": "last name",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "user_email@example.com",
+									"description": "email|string|unique"
+								},
+								{
+									"key": "password",
+									"value": "admin@123",
+									"description": "requried|string"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://test-ecomerce.xn--hrt-w-ova.de/api/register",
+							"protocol": "http",
+							"host": [
+								"test-ecomerce",
+								"xn--hrt-w-ova",
+								"de"
+							],
+							"path": [
+								"api",
+								"register"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "this request return token and user object"
+					},
+					"response": [
+						{
+							"name": "register",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "User-Type",
+										"value": "personal",
+										"description": "business || personal",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "first name",
+											"description": "first name",
+											"type": "text"
+										},
+										{
+											"key": "lastname",
+											"value": "last name",
+											"description": "last name",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "user_email@example.com",
+											"description": "email|string|unique"
+										},
+										{
+											"key": "password",
+											"value": "admin@123",
+											"description": "requried|string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/register",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"register"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 07:43:32 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": \"User registered successfully. Please verify your email.\",\n    \"detailed_error\": null,\n    \"data\": {\n        \"name\": \"first name\",\n        \"lastname\": \"last name\",\n        \"email\": \"user_email@example.com\",\n        \"updated_at\": \"2025-02-20T07:43:32.000000Z\",\n        \"created_at\": \"2025-02-20T07:43:32.000000Z\",\n        \"id\": 16,\n        \"is_verfied\": 0,\n        \"token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZTgzMmExMTcwZTJmNzE4YzJhNjFkNDQ5MjEzZDYxYTJlYWI0MWU3MGQ3YjcyYWI5NTg2M2Q3MDRiNmU3YWJlNDY3ZjdlNjA1ZDAzNGUzNDEiLCJpYXQiOjE3NDAwMzc0MTIuNDkyODA4LCJuYmYiOjE3NDAwMzc0MTIuNDkyODA5LCJleHAiOjE3NzE1NzM0MTIuNDg2NTMyLCJzdWIiOiIxNiIsInNjb3BlcyI6W119.nMtsEzckYhyrs0rKN61QzFRmGY26DEiRQVzfxIjurN1AofSIi2zD0ntjQ1iA9i9MNKXoEkvvNhBqbM5FPMvcHBMS4yHQGbAMmEutvAbCh0f8dLDzlK7C4HTm8GmF16YibZlLAaOKgYJSBY5R1pp63L4HDl57TP-i9AJgMqd-lju8wCZWyjEWw7CevdRldCRhF9rLju8O0mvC184D5-nRT-ABdOroYnh-9cDIZ2c5-yQCUVf1SFFxfbmCch3ckxE2LpWQNUat07AAQ7YkKr4VLTxW9q5hgiRG_WL5sl_9tfqZ9MWQc5IMftACtYgw-sUtG5K9sGAcP4qL5z9-j4aUToscKTCuU0S0khLD4KFKSvFPiiniFGx15vzS8qa8zAU8lY-edJULKn-Txlfre15YPl0pKqqGmEL8iCCu9D4NpG4oyOE6EjpmBH-Ci1gGGA0NPwtvFXUCcgoDtYLbc0VjEri57nXiq7G088w4XZreHv2bOdnyrIBBvptjdc360Qq5x8HiwM-x6gHLTR96ZkrHSrvLjQgcUNdQVoMjtaiQebjfoBsnnONYEWI4gT8nkc5YtqLHGdd7e-uvbZMQ91xBLPp0D2cxSFV9JKaPz5i7_ciMZOZ-z4ePtSpRuN2CU9_2isMToU8d-nyN7RZiSD7Eoti2dvMCxd9JhgDV4kmL6B4\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "User-Type",
+								"value": "personal",
+								"description": "business || personal",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "test-ecomerce.hrt-wü.de/api/out",
+							"host": [
+								"test-ecomerce",
+								"hrt-wü",
+								"de"
+							],
+							"path": [
+								"api",
+								"out"
+							]
+						},
+						"description": "this request return token and user object"
+					},
+					"response": [
+						{
+							"name": "logout",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "User-Type",
+										"value": "personal",
+										"description": "business || personal",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/out",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"out"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 07:45:28 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": \"User has been successfully logged out.\"\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "get categories",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiMWViM2EzMTk4YzQ0MGY1NGI4ZWY4OTAxOWU3MzVkNTBkOTE1NmI5NThkNTFkMTlkNzRjOTY5YTYzM2U2MjI4NTY3NzE4OGEyN2I5YTYwZDUiLCJpYXQiOjE3Mzg4MTcwNzguNTA3MjY4LCJuYmYiOjE3Mzg4MTcwNzguNTA3MjcsImV4cCI6MTc3MDM1MzA3OC40OTQ2MzgsInN1YiI6IjEiLCJzY29wZXMiOltdfQ.txuhlTpVp8YqshxVNJVBohJvih18cZJE7bc6I_cYiQxlmBUdAQ1vhmiAQ3Oj4kCLPjApqjDxjgQRYW-p3kml5oMBdH3Z3NowENXk8ravn4k3U_63u8HFRSIkLgu0V21vnl1NjZBadsAfE3nDkTFdfy-4uHNlCO28qtXAEV3EG49GAp1nH4KSwHreVyBjMglo5qOnoyC_Ed9GKvQ780QQCJrjyshsdBf3z5tfYHrbGqkmnPG_-0mFVRp1BAg0XBWUau9wKI1mw2LEZUT5oQX2l8gqSKN1so_2HFE5-fquTqOVs9_dPZGRfF6v41Jna1zNz4xxSi36mtwH1r6aYiOZJtFAtLI2Jy6Eo80G_QjUwG68ciH9jt0q1OS1-yZwQwDs4cpYeyB4bWPB772Uuv1_7lpyypQHizJwld_5Bl2GORkamtIjnkUf-y0KuCOrg7S2uiTzMuT8AnRGfuGquVUI2KCjLHg3e3awjj0D3UT7E167coNKNd5WguOjiL1YnIcpUtuxT2iP0BZEHnA1fdYhHLRy2VWUibzVlQtg_0Tzhep5MAFclw3S71FdR0vXgAyBAd0efEQbB_J-NALt8ek1Bo9bS1940sucNDEuLol-UHFbnfigDV3FH9R1zJQaFrTnSIeHB99OQWTT6JU_HK8KxUpkGY0OFMytIsmoDbiFveY",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en",
+								"description": "en|ar",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/category/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"category",
+								"get"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "get categories",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "en",
+										"description": "en|ar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/category/get",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"category",
+										"get"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:35:30 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "57"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": [\n        {\n            \"id\": 5,\n            \"title\": \"Living Room\",\n            \"description\": \"Explore our curated collection of living room essentials designed to elevate your space. From cozy sofas and stylish coffee tables to functional TV stands and elegant lighting, find everything you need to create a comfortable and inviting living area. Shop now for quality furniture and decor that suits your style!\",\n            \"image\": \"storage/app/public/Category/f1_1740041673.png\",\n            \"status\": 1,\n            \"created_at\": \"2025-02-20T08:54:33.000000Z\",\n            \"updated_at\": \"2025-02-20T08:54:33.000000Z\"\n        },\n        {\n            \"id\": 6,\n            \"title\": \"Bed Room\",\n            \"description\": \"Transform your bedroom into a cozy retreat with our collection of stylish and functional furniture. From comfortable beds and spacious wardrobes to elegant nightstands and dressers, find everything you need to create your perfect sleep sanctuary. Shop now for quality pieces that combine comfort and design!\",\n            \"image\": \"storage/app/public/Category/image1_1740041906.png\",\n            \"status\": 1,\n            \"created_at\": \"2025-02-20T08:58:26.000000Z\",\n            \"updated_at\": \"2025-02-20T08:58:26.000000Z\"\n        },\n        {\n            \"id\": 7,\n            \"title\": \"Kitchen\",\n            \"description\": \"Upgrade your kitchen with our premium collection of furniture and essentials. Discover stylish dining tables, functional storage cabinets, modern kitchen islands, and high-quality cookware to make cooking and dining a delightful experience. Shop now for durable and elegant solutions that fit your lifestyle!\",\n            \"image\": \"storage/app/public/Category/image3_1740041959.png\",\n            \"status\": 1,\n            \"created_at\": \"2025-02-20T08:59:19.000000Z\",\n            \"updated_at\": \"2025-02-20T08:59:19.000000Z\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "get category",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"description": "en|ar",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/category/find/5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"category",
+								"find",
+								"5"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "get category",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"description": "en|ar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/category/find/5",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"category",
+										"find",
+										"5"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:36:17 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "56"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"id\": 5,\n        \"title\": \"غرفة معيشة\",\n        \"description\": \"القهوة الأنيقة إلى حوامل التلفزيون العملية والإضاءة الراقية، ستجد كل ما تحتاجه لإنشاء مساحة معيشة مريحة وجذابة. تسوق الآن للحصول على أثاث وديكور عالي الجودة يناسب ذوقك!\",\n        \"image\": \"storage/app/public/Category/f1_1740041673.png\",\n        \"status\": 1,\n        \"created_at\": \"2025-02-20T08:54:33.000000Z\",\n        \"updated_at\": \"2025-02-20T08:54:33.000000Z\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Products By Category",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "headerPrefix",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "tokenType",
+									"value": "",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Country-Id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/product/category?category_id=1&page=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"product",
+								"category"
+							],
+							"query": [
+								{
+									"key": "category_id",
+									"value": "1",
+									"description": "required"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "pagination"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Products By Category",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Country-Id",
+										"value": "1",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/product/category?category_id=1&page=1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"product",
+										"category"
+									],
+									"query": [
+										{
+											"key": "category_id",
+											"value": "1",
+											"description": "required"
+										},
+										{
+											"key": "page",
+											"value": "1",
+											"description": "pagination"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:33:10 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": false,\n    \"code\": 422,\n    \"hasContent\": false,\n    \"message\": \"The selected category id is invalid.\",\n    \"detailed_error\": null,\n    \"data\": null\n}"
+						}
+					]
+				},
+				{
+					"name": "get product detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"description": "ar|en",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/product/find/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"product",
+								"find",
+								"3"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "get product detail",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"description": "ar|en",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/product/find/3",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"product",
+										"find",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:34:59 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"id\": 3,\n        \"title\": \"كرسي بالتسار من ايكيا\",\n        \"description\": \"كرسي بالتسار من ايكيا - موديل ثلاثي الأبعاد هو إضافة عصرية وأنيقة لأي مساحة معيشة. مصمم للراحة والمتانة، يتميز هذا الكرسي بإطار أنيق وتصميم مريح، مما يجعله مثاليًا للاسترخاء أو العمل. يتيح لك الموديل ثلاثي الأبعاد تصور كيفية تناسقه مع ديكور منزلك قبل الشراء.\",\n        \"information\": \"المواد: خشب عالي الجودة وقماش\\n\\nالأبعاد: 80 سم (ارتفاع) × 60 سم (عرض) × 55 سم (عمق)\\n\\nالألوان المتاحة: أسود، رمادي، بيج\\n\\nالقدرة على التحمل: 120 كجم\\n\\nالتركيب: سهل التركيب مع تعليمات مرفقة\",\n        \"shipping_return\": \"\",\n        \"price\": \"120.00\",\n        \"discount\": \"15.00\",\n        \"discount_Price\": \"102.00\",\n        \"quantity\": 0,\n        \"sold\": \"1.00\",\n        \"featured_Product\": 1,\n        \"best_Selling\": 1,\n        \"new_Arrival\": 1,\n        \"on_Sale\": 1,\n        \"status\": 1,\n        \"created_at\": \"2025-02-20T09:09:10.000000Z\",\n        \"updated_at\": \"2025-02-20T14:22:04.000000Z\",\n        \"categories\": [\n            {\n                \"id\": 5,\n                \"title\": \"غرفة معيشة\",\n                \"description\": \"القهوة الأنيقة إلى حوامل التلفزيون العملية والإضاءة الراقية، ستجد كل ما تحتاجه لإنشاء مساحة معيشة مريحة وجذابة. تسوق الآن للحصول على أثاث وديكور عالي الجودة يناسب ذوقك!\",\n                \"image\": \"storage/app/public/Category/f1_1740041673.png\",\n                \"status\": 1,\n                \"created_at\": \"2025-02-20T08:54:33.000000Z\",\n                \"updated_at\": \"2025-02-20T08:54:33.000000Z\"\n            }\n        ],\n        \"colors\": [\n            {\n                \"id\": 1,\n                \"name\": \"احمر\",\n                \"code\": \"#fffff\",\n                \"created_at\": \"2025-02-08T13:56:28.000000Z\",\n                \"updated_at\": \"2025-02-08T13:56:28.000000Z\"\n            }\n        ],\n        \"sizes\": [\n            {\n                \"id\": 1,\n                \"Size\": \"صغير\",\n                \"created_at\": \"2025-02-08T13:56:28.000000Z\",\n                \"updated_at\": \"2025-02-08T13:56:28.000000Z\"\n            }\n        ],\n        \"productimage\": [\n            {\n                \"id\": 4,\n                \"product_id\": 3,\n                \"link\": \"storage/app/public/Product/1740042550_67b6f136af5c0_p1.png\",\n                \"created_at\": \"2025-02-20T09:09:10.000000Z\",\n                \"updated_at\": \"2025-02-20T09:09:10.000000Z\"\n            }\n        ]\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get Cart Items",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Country-Id",
+								"value": "1",
+								"type": "text"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/cart/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"items"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get Cart Items",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Country-Id",
+										"value": "1",
+										"type": "text"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/cart/items",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cart",
+										"items"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:29:02 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "57"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"cart_items\": [\n            {\n                \"rowId\": \"fc310a41411635d1ab30564aa9c21e85\",\n                \"id\": 3,\n                \"name\": \"Baltsar Ikea Chair\",\n                \"qty\": 8,\n                \"price\": 102,\n                \"weight\": 120,\n                \"options\": {\n                    \"sku\": null,\n                    \"name\": \"Baltsar Ikea Chair\",\n                    \"size\": null,\n                    \"color\": null,\n                    \"discount_price\": \"102.00\",\n                    \"discount_parcent\": \"15.00\",\n                    \"variant_id\": null,\n                    \"variant_name\": null\n                },\n                \"discount\": 0,\n                \"tax\": 0,\n                \"subtotal\": 816\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Add Item To Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Country-Id",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "item_id",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "qty",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/add-item",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"add-item"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Add Item To Cart",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Country-Id",
+										"value": "1",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "item_id",
+											"value": "3",
+											"type": "text"
+										},
+										{
+											"key": "qty",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cart/add-item",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cart",
+										"add-item"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:28:08 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"cart_items\": [\n            {\n                \"rowId\": \"fc310a41411635d1ab30564aa9c21e85\",\n                \"id\": 3,\n                \"name\": \"Baltsar Ikea Chair\",\n                \"qty\": \"4\",\n                \"price\": 102,\n                \"weight\": 120,\n                \"options\": {\n                    \"sku\": null,\n                    \"name\": \"Baltsar Ikea Chair\",\n                    \"size\": null,\n                    \"color\": null,\n                    \"discount_price\": \"102.00\",\n                    \"discount_parcent\": \"15.00\",\n                    \"variant_id\": null,\n                    \"variant_name\": null\n                },\n                \"discount\": 0,\n                \"tax\": 0,\n                \"subtotal\": 408\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Increase Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"item_id\": 3,\r\n    \"qty\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/increase-item",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"increase-item"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Increase Item",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"item_id\": 3,\r\n    \"qty\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cart/increase-item",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cart",
+										"increase-item"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:30:29 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"cart_items\": [\n            {\n                \"rowId\": \"fc310a41411635d1ab30564aa9c21e85\",\n                \"id\": 3,\n                \"name\": \"Baltsar Ikea Chair\",\n                \"qty\": 9,\n                \"price\": 102,\n                \"weight\": 120,\n                \"options\": {\n                    \"sku\": null,\n                    \"name\": \"Baltsar Ikea Chair\",\n                    \"size\": null,\n                    \"color\": null,\n                    \"discount_price\": \"102.00\",\n                    \"discount_parcent\": \"15.00\",\n                    \"variant_id\": null,\n                    \"variant_name\": null\n                },\n                \"discount\": 0,\n                \"tax\": 0,\n                \"subtotal\": 918\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Decrease Item",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"item_id\": 3,\r\n    \"qty\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/decrease-item",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"decrease-item"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Decrease Item",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"item_id\": 3,\r\n    \"qty\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cart/decrease-item",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cart",
+										"decrease-item"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:30:47 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "58"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"cart_items\": [\n            {\n                \"rowId\": \"fc310a41411635d1ab30564aa9c21e85\",\n                \"id\": 3,\n                \"name\": \"Baltsar Ikea Chair\",\n                \"qty\": 8,\n                \"price\": 102,\n                \"weight\": 120,\n                \"options\": {\n                    \"sku\": null,\n                    \"name\": \"Baltsar Ikea Chair\",\n                    \"size\": null,\n                    \"color\": null,\n                    \"discount_price\": \"102.00\",\n                    \"discount_parcent\": \"15.00\",\n                    \"variant_id\": null,\n                    \"variant_name\": null\n                },\n                \"discount\": 0,\n                \"tax\": 0,\n                \"subtotal\": 816\n            }\n        ]\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Remove Item From Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"item_id\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/remove-item",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"remove-item"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Remove Item From Cart",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"item_id\": 3\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cart/remove-item",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cart",
+										"remove-item"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:31:01 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "56"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"cart_items\": []\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/cart/destroy-cart",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cart",
+								"destroy-cart"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Clear Cart",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/cart/destroy-cart",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"cart",
+										"destroy-cart"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:31:16 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "55"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": false,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": null\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Order Price",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Country-Id",
+								"value": "1",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/order/order-price",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order",
+								"order-price"
+							],
+							"query": [
+								{
+									"key": "cod",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "country",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "coupon",
+									"value": "ANF-NTGECGKRR8N9",
+									"disabled": true
+								},
+								{
+									"key": "redeem",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Order Price",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Country-Id",
+										"value": "1",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/order/order-price",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"order",
+										"order-price"
+									],
+									"query": [
+										{
+											"key": "cod",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "country",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "coupon",
+											"value": "ANF-NTGECGKRR8N9",
+											"disabled": true
+										},
+										{
+											"key": "redeem",
+											"value": "1",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:31:35 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"subtotal\": 0,\n        \"tax\": 0,\n        \"shipping_charge\": 0,\n        \"discount\": 0,\n        \"grand_total\": 0\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "shipping_street_address",
+									"value": "shipping_street_address",
+									"type": "text"
+								},
+								{
+									"key": "shipping_state",
+									"value": "Cairo",
+									"type": "text"
+								},
+								{
+									"key": "shipping_country",
+									"value": "Egypt",
+									"type": "text"
+								},
+								{
+									"key": "payment_method",
+									"value": "card",
+									"description": "card || paypal",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/order/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"order",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create Order",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "shipping_street_address",
+											"value": "shipping_street_address",
+											"type": "text"
+										},
+										{
+											"key": "shipping_state",
+											"value": "Dubai",
+											"type": "text"
+										},
+										{
+											"key": "shipping_country",
+											"value": "United Arab Emirates",
+											"type": "text"
+										},
+										{
+											"key": "payment_method",
+											"value": "STRIPE",
+											"description": "PAYPAL || stripe",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/api/order/create",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"api",
+										"order",
+										"create"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=15"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 20 Feb 2025 14:22:04 GMT"
+								},
+								{
+									"key": "Server",
+									"value": "Apache"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "59"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"isSuccessful\": true,\n    \"hasContent\": true,\n    \"code\": 200,\n    \"message\": null,\n    \"detailed_error\": null,\n    \"data\": {\n        \"id\": 41,\n        \"external_id\": null,\n        \"Order_Number\": \"C3XnkD\",\n        \"order_bill\": null,\n        \"User_Id\": 16,\n        \"Billing_Id\": null,\n        \"Shipping_Id\": null,\n        \"billing_address\": \"{\\\"street\\\":null,\\\"state\\\":null,\\\"country\\\":null}\",\n        \"shipping_address\": \"{\\\"street\\\":\\\"shipping_street_address\\\",\\\"state\\\":\\\"Dubai\\\",\\\"country\\\":\\\"United Arab Emirates\\\"}\",\n        \"Coupon_Id\": null,\n        \"Coupon_Amount\": \"0.00\",\n        \"hearts_discount\": \"0.00\",\n        \"Delivery_Charge\": \"0.00\",\n        \"Sub_Total\": \"948.00\",\n        \"Tax\": \"0.00\",\n        \"Grand_Total\": \"948.00\",\n        \"Is_Free_Delivery\": 0,\n        \"Is_Order_Successful\": 0,\n        \"Is_Order_Completed\": 0,\n        \"Payment_Method\": \"STRIPE\",\n        \"Payment_Status\": 1,\n        \"Order_Status\": 1,\n        \"txn\": \"hB8KINuN\",\n        \"tap_payment_method_id\": null,\n        \"app_id\": null,\n        \"cart_token\": null,\n        \"checkout_id\": null,\n        \"checkout_token\": null,\n        \"cancelled_at\": null,\n        \"closed_at\": null,\n        \"name\": null,\n        \"number\": null,\n        \"order_status_url\": null,\n        \"cancel_requested\": 0,\n        \"return_requested\": 0,\n        \"cancel_reason\": null,\n        \"return_reason\": null,\n        \"Delivery_At\": null,\n        \"created_at\": \"2025-02-20T14:22:04.000000Z\",\n        \"updated_at\": \"2025-02-20T14:22:05.000000Z\",\n        \"session_id\": \"cs_test_a1IhApiAdmBtrApleM4zDXElLNZO4lV8RlNSJRCLMKXLv90kYGObl8sJrL\",\n        \"session_url\": \"https://checkout.stripe.com/c/pay/cs_test_a1IhApiAdmBtrApleM4zDXElLNZO4lV8RlNSJRCLMKXLv90kYGObl8sJrL#fidkdWxOYHwnPyd1blpxYHZxWjA0STJPVnNES1RCRjFhMU01YHN9M1J3b0sxTVVfTXVTSn9mf2lSUGt9QHF8a2t1NzU0YENkN3BHZEh8fEdfS0lINkl9ZE9Of0FIbmpiN2wwfG9QbjFyQlFoNTVKZnRSZnFRdycpJ2N3amhWYHdzYHcnP3F3cGApJ2lkfGpwcVF8dWAnPyd2bGtiaWBabHFgaCcpJ2BrZGdpYFVpZGZgbWppYWB3dic%2FcXdwYHgl\",\n        \"order_details\": [\n            {\n                \"id\": 40,\n                \"external_id\": null,\n                \"sku\": null,\n                \"Order_Id\": 41,\n                \"Product_Id\": 4,\n                \"Variant_Id\": null,\n                \"Product_Name\": \"Luxury Velvet Chair\",\n                \"Variant_Name\": null,\n                \"Image\": null,\n                \"Size\": null,\n                \"Color\": null,\n                \"Price\": \"135.00\",\n                \"Quantity\": 4,\n                \"Total_Price\": \"540.00\",\n                \"created_at\": \"2025-02-20T14:22:04.000000Z\",\n                \"updated_at\": \"2025-02-20T14:22:04.000000Z\",\n                \"image_link\": \"http://test-ecomerce.xn--hrt-w-ova.de/uploaded_files/product_image/\"\n            },\n            {\n                \"id\": 41,\n                \"external_id\": null,\n                \"sku\": null,\n                \"Order_Id\": 41,\n                \"Product_Id\": 3,\n                \"Variant_Id\": null,\n                \"Product_Name\": \"Baltsar Ikea Chair\",\n                \"Variant_Name\": null,\n                \"Image\": null,\n                \"Size\": null,\n                \"Color\": null,\n                \"Price\": \"102.00\",\n                \"Quantity\": 4,\n                \"Total_Price\": \"408.00\",\n                \"created_at\": \"2025-02-20T14:22:04.000000Z\",\n                \"updated_at\": \"2025-02-20T14:22:04.000000Z\",\n                \"image_link\": \"http://test-ecomerce.xn--hrt-w-ova.de/uploaded_files/product_image/\"\n            }\n        ],\n        \"user\": {\n            \"id\": 16,\n            \"name\": \"first name\",\n            \"description\": null,\n            \"email\": \"user_email@example.com\",\n            \"email_verified_at\": null,\n            \"is_admin\": 0,\n            \"image\": null,\n            \"created_at\": \"2025-02-20T07:43:32.000000Z\",\n            \"updated_at\": \"2025-02-20T07:43:32.000000Z\",\n            \"lastname\": \"last name\",\n            \"is_verfied\": 0,\n            \"socialite_id\": null,\n            \"provider\": null\n        },\n        \"tap_payment_method\": null,\n        \"coupon\": null\n    }\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}

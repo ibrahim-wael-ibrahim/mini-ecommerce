@@ -1,0 +1,16 @@
+#!/bin/bash
+# This script appends each file in the src directory to PROMPT.txt with a header and separator.
+
+# Optional: Write a starting header in PROMPT.txt (this will append to the file)
+echo -e "\n======= Appending src file contents =======\n" >> PROMPT.txt
+
+# Find all files in the src directory and loop through them
+find src -type f | while IFS= read -r file; do
+    # Write a header with the file path and name
+    echo "File: $file" >> PROMPT.txt
+    echo "------------------------" >> PROMPT.txt
+    # Append the file content
+    cat "$file" >> PROMPT.txt
+    # Append the separator
+    echo -e "\n__________\n" >> PROMPT.txt
+done

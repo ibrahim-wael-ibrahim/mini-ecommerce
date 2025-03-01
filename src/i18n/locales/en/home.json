@@ -1,0 +1,32 @@
+{
+  "heroSection": {
+    "title": "Make your interior more minimalistic & modern",
+    "description": "Turn your room with panto into a lot more minimalist and modern with ease and speed",
+    "searchPlaceholder": "Search"
+  },
+  "ourCategories": {
+    "title": "Our\nCategories"
+  },
+  "dreamSection": {
+    "title": "Furnish Your Dreams,\nChoose Wisely",
+    "description": "Discover quality furniture, curated styles, and exceptional service at Our Store. We make furnishing your home easy and enjoyable."
+  },
+  "homeFeaturesSection": {
+    "subtitle": "some of our",
+    "title": "Features we offer to you",
+    "items": {
+      "extensiveCatalog": {
+        "title": "Extensive Catalog",
+        "description": "A wide selection of furniture styles, categories, and price points."
+      },
+      "detailedProductDescriptions": {
+        "title": "Detailed Product Descriptions",
+        "description": "Comprehensive information including dimensions, materials, care instructions, and warranty details."
+      },
+      "roomPlanner": {
+        "title": "Room Planner/Visualizer",
+        "description": "Tools to help customers visualize furniture in their own spaces."
+      }
+    }
+  }
+}

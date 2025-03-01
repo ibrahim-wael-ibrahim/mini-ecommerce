@@ -1,0 +1,3 @@
+1) structure
+    - dark mode and colors ✅
+    - i18n Ar and En
