@@ -4,7 +4,7 @@ import CategoryCard from "@/components/molecules/CategoryCard";
 import { useTranslations } from "next-intl";
 import { useGetCategoriesQuery } from "@/features/categories/categoryApi";
 import { useCusLocale } from "@/hooks/useCusLocale";
-import CategoryCardSkeleton from "@/components/skeletion/CategoryCardSkeleton";
+import Spinner from "@/components/atoms/Spinner";
 
 export default function HomeOurCategories() {
   const t = useTranslations("home");
@@ -25,7 +25,7 @@ export default function HomeOurCategories() {
           ))}
       </h1>
       {isLoading ? (
-        <CategoryCardSkeleton />
+        <Spinner size="xl" />
       ) : error ? (
         <div>error</div>
       ) : (

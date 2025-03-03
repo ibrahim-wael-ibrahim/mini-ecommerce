@@ -1,5 +1,8 @@
 #!/bin/bash
 # This script appends each file in the src directory to PROMPT.txt with a header and separator.
+echo -e "\n======= File Structure =======\n" >> PROMPT.txt
+
+tree src >> PROMPT.txt
 
 # Optional: Write a starting header in PROMPT.txt (this will append to the file)
 echo -e "\n======= Appending src file contents =======\n" >> PROMPT.txt

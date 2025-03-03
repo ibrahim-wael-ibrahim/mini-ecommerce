@@ -22,8 +22,8 @@ export default function ProgressIndicator({ currentStep }) {
           disabled={currentStep < step}
         >
           <div
-            className={`max-w-[194px] p-1 rounded-full flex justify-between items-center gap-2 ${
-              currentStep > step ? "bg-customGreenW gap-8" : ""
+            className={`max-w-[194px] md:p-1 rounded-full flex justify-between items-center gap-2 ${
+              currentStep > step ? "bg-customGreenW md:gap-8" : ""
             }`}
           >
             <span>
@@ -47,7 +47,7 @@ export default function ProgressIndicator({ currentStep }) {
           </div>
           {step < 4 && (
             <div
-              className={`h-[1px] min-w-[173px] ${
+              className={`h-px md:min-w-[173px] min-w-[40px] ${
                 currentStep >= step ? "bg-customGreenW" : "bg-customControlBg"
               }`}
             ></div>

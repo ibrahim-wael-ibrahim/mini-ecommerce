@@ -1,32 +1,29 @@
 import fixImageUrl from "@/utils/fixImageUrl";
-import ProductDetailsPage from "@/pages/ProductDetailsPage";
+import ProductDetailsPage from "@/components/organisms/ProductDetailsPage";
 
 export const revalidate = 360;
 
+export async function generateStaticParams() {
+  return [{ id: "3" }, { id: "4" }]; // Hardcoded; replace with API if available
+}
+
 export async function generateMetadata({ params, searchParams }) {
-  const { id } = await params;
-  const { lang } = await searchParams;
+  const { id } = await params; // Await params
+  const { lang } = await searchParams; // Await searchParams
 
-  // Use HTTPS if supported and fetch the product details.
   const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/product/find/${id}`;
-
   try {
     const res = await fetch(apiUrl, {
       headers: {
-        "Accept-Language": lang,
+        "Accept-Language": lang || "en",
       },
     });
-
     const json = await res.json();
     const product = json.data;
+    const ogImageUrl = product.productimage?.[0]?.link
+      ? fixImageUrl(product.productimage[0].link)
+      : "";
 
-    // Use the first product image (if available) for Open Graph/Twitter image.
-    const ogImageUrl =
-      product.productimage && product.productimage.length > 0
-        ? fixImageUrl(product.productimage[0].link)
-        : "";
-
-    // Create a keywords array based on the product title and other generic keywords.
     const keywords = [
       product.title,
       "ecommerce",
@@ -34,13 +31,12 @@ export async function generateMetadata({ params, searchParams }) {
       "product",
       "sale",
     ];
-
     return {
       title: product.title,
       description: product.description,
-      keywords: keywords,
+      keywords,
       openGraph: {
-        type: "website", // Changed from "product" to "website"
+        type: "website",
         title: product.title,
         description: product.description,
         images: [ogImageUrl],
@@ -66,6 +62,36 @@ export async function generateMetadata({ params, searchParams }) {
   }
 }
 
-export default function Page({ params }) {
-  return <ProductDetailsPage params={params} />;
+export async function getProductData(id, locale) {
+  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/product/find/${id}`;
+  try {
+    const res = await fetch(apiUrl, {
+      headers: {
+        "Accept-Language": locale || "en",
+        Accept: "application/json",
+        "User-Type": "personal",
+      },
+    });
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error(`Failed to fetch product: ${res.status}`);
+    }
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("Error fetching product data:", error);
+    return null;
+  }
+}
+
+export default async function Page({ params, searchParams }) {
+  const { id } = await params; // Await params
+  const { lang } = await searchParams; // Await searchParams
+  const product = await getProductData(id, lang);
+
+  if (!product) {
+    return { notFound: true };
+  }
+
+  return <ProductDetailsPage params={{ id }} initialProduct={product} />;
 }

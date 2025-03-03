@@ -29,7 +29,7 @@ export function Providers({ children }) {
         >
           {children}
         </GoogleOAuthProvider>
-        <Toaster position="top-right" richColors />
+        <Toaster position="bottom-right" richColors />
       </Provider>
     </ThemeProvider>
   );

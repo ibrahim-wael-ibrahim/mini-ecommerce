@@ -17,46 +17,51 @@ import { GoShareAndroid } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "@/features/cart/cartSlice";
 import { useAddItemToCartMutation } from "@/features/cart/cartApi";
+import { toast } from "sonner";
+import Spinner from "@/components/atoms/Spinner";
 
-function ProductDetailsPage() {
+function ProductDetailsPage({ params, initialProduct }) {
   const { locale } = useCusLocale();
-  const { id } = useParams();
+  const { id } = params;
   const searchParams = useSearchParams();
   const currentLang = searchParams.get("lang");
   const [isMounted, setIsMounted] = useState(false);
   const t = useTranslations("categories");
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth); // Get auth state
+  const auth = useSelector((state) => state.auth);
   const [quantity, setQuantity] = useState(1);
   const [addItemToCart, { isLoading: isAdding }] = useAddItemToCartMutation();
 
   const {
-    data: product,
+    data: product = initialProduct,
     isLoading,
     error,
-  } = useGetProductByIdQuery({ id, locale });
+  } = useGetProductByIdQuery(
+    { id, locale },
+    { skip: !isMounted || !!initialProduct },
+  );
 
   const handleAddToCart = async () => {
+    if (!product) return;
     const cartItem = {
       id: product.id,
       name: product.title,
-      price: product.discount_price || product.price, // Use discount if available
+      price: product.discount_Price || product.price,
       qty: quantity,
       image: product.productimage[0].link,
     };
 
     if (auth.token) {
       try {
-        await addItemToCart({
-          item_id: product.id,
-          qty: quantity,
-        }).unwrap();
+        await addItemToCart({ item_id: product.id, qty: quantity }).unwrap();
+        toast.success("Item added to cart!");
       } catch (error) {
         console.error("Add to cart failed:", error);
         toast.error("Failed to add item to cart.");
       }
     } else {
-      dispatch(addItem(cartItem)); // Price is included in cartItem
+      dispatch(addItem(cartItem));
+      toast.success("Item added to cart!");
     }
   };
 
@@ -71,28 +76,22 @@ function ProductDetailsPage() {
     setIsMounted(true);
   }, []);
 
-  if (isLanguageRefreshing || isLoading) {
+  if (!isMounted || isLanguageRefreshing || isLoading) {
     return (
       <div className="min-h-[80dvh] p-8 mx-10 my-20 flex flex-col justify-center items-center">
-        <div role="status">
-          <span className="sr-only">Loading...</span>
-        </div>
+        <Spinner size="lx" />
       </div>
     );
   }
 
-  if (error) {
-    return <p>Error fetching product details</p>;
-  }
+  if (error) return <p>Error fetching product details</p>;
+  if (!product) return <p>No product data found</p>;
 
-  if (!product) {
-    return <p>No product data found</p>;
-  }
-  const [priceSy, priceVal] = getFormattedPriceComponents(product?.price);
+  const [priceSy, priceVal] = getFormattedPriceComponents(product.price);
   const [discountSy, discountVal] = getFormattedPriceComponents(
-    product?.discount_Price,
+    product.discount_Price,
   );
-  // Render product details.
+
   return (
     <section className="min-h-[80dvh] p-8 my-32 flex flex-col justify-center items-start container mx-auto">
       <div className="flex flex-col justify-center items-start gap-8 mb-10">
@@ -111,12 +110,12 @@ function ProductDetailsPage() {
         </div>
       </div>
       <section
-        className={`min-h-[60dvh] container  transition-opacity duration-500 ${
+        className={`min-h-[60dvh] container transition-opacity duration-500 ${
           isMounted ? "opacity-100" : "opacity-0"
-        }  grid grid-cols-2 gap-8`}
+        } grid md:grid-cols-2 gap-8`}
       >
-        <article className="w-full h-full  grid grid-cols-2 grid-rows-2 place-content-center gap-1">
-          <div className="w-full h-full  col-span-2 bg-customLightBg dark:bg-customOrangeBg">
+        <article className="w-full h-full grid grid-cols-2 grid-rows-2 place-content-center gap-1">
+          <div className="w-full h-full col-span-2 bg-customLightBg dark:bg-customOrangeBg">
             <Image
               src={fixImageUrl(product.productimage[0].link)}
               alt={product.title}
@@ -125,13 +124,13 @@ function ProductDetailsPage() {
               className="mx-auto"
             />
           </div>
-          <div className="relative  bg-customLightBg dark:bg-customOrangeBg overflow-hidden">
+          <div className="relative bg-customLightBg dark:bg-customOrangeBg overflow-hidden">
             <Image
               src={fixImageUrl(product.productimage[0].link)}
               alt={product.title}
               width={400}
               height={400}
-              className="  scale-[1.20] absolute -top-28 left-4"
+              className="scale-[1.20] absolute -top-28 left-4"
             />
           </div>
           <div className="relative bg-customLightBg dark:bg-customOrangeBg overflow-hidden">
@@ -144,7 +143,7 @@ function ProductDetailsPage() {
             />
           </div>
         </article>
-        <article className="w-full h-full flex flex-col justify-between items-center ">
+        <article className="w-full h-full flex flex-col justify-between items-center">
           <div>
             <div className="flex justify-between items-end mb-8">
               <span className="text-6xl capitalize font-extrabold">
@@ -153,25 +152,25 @@ function ProductDetailsPage() {
               {product.price === product.discount_Price ? (
                 <span className="font-extrabold text-3xl flex justify-center items-start gap-2">
                   <span className="relative text-lg -top-1">{priceSy}</span>
-                  <span className="">{priceVal}</span>
+                  <span>{priceVal}</span>
                 </span>
               ) : (
                 <div className="flex flex-col justify-end items-start font-extrabold">
-                  <span className=" text-md opacity-60 flex justify-center items-start gap-2">
+                  <span className="text-md opacity-60 flex justify-center items-start gap-2">
                     <span className="relative text-lg -top-1">{priceSy}</span>
                     <span className="line-through">{priceVal}</span>
                   </span>
-                  <span className=" text-3xl flex justify-center items-start gap-2">
+                  <span className="text-3xl flex justify-center items-start gap-2">
                     <span className="relative text-lg -top-1">
                       {discountSy}
                     </span>
-                    <span className="">{discountVal}</span>
+                    <span>{discountVal}</span>
                   </span>
                 </div>
               )}
             </div>
             <p>{product.description}</p>
-            <p className="py-4  leading-6">
+            <p className="py-4 leading-6">
               {product.information.split("\n\n").map((line, index, arr) => (
                 <React.Fragment key={index}>
                   {line}
@@ -180,7 +179,7 @@ function ProductDetailsPage() {
               ))}
             </p>
           </div>
-          <div className="border-t-2 w-full ">
+          <div className="border-t-2 w-full">
             <div className="py-5 flex flex-col justify-between items-center gap-4">
               <div className="flex justify-between items-center gap-4 w-full">
                 <div className="flex justify-start items-center gap-4 w-full">

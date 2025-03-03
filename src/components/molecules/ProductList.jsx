@@ -12,7 +12,6 @@ export default function ProductList({ categoryId }) {
     error,
   } = useGetProductsByCategoryQuery({ categoryId, locale });
   if (isLoading) return <div>load...</div>;
-  console.log(products);
   return (
     <section className="min-h-dvh relative grid grid-cols-1 md:grid-cols-4 gap-28 justify-items-center w-full mt-20 py-20 mx-auto  ">
       {products &&

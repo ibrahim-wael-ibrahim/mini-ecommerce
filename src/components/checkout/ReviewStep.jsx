@@ -23,12 +23,12 @@ export default function ReviewStep({
         <h2 className="text-2xl font-bold">{t("title")}</h2>
         <p className="capitalize opacity-60">{t("subtitle")}</p>
       </div>
-      <div className="grid  md:grid-cols-2 gap-8 w-full">
-        <div>
+      <div className="flex flex-col-reverse md:flex-row gap-8 w-full">
+        <div className="w-full md:px-32">
           <h3 className="text-xl font-semibold mb-2 uppercase">
             {t("cartTitle", { count: cartItems.length })}
           </h3>
-          <article className="max-h-[645px] min-h-96 overflow-scroll scroll-m-2 bg-customLightBg dark:bg-customOrangeBg rounded-3xl py-8">
+          <article className="max-h-[645px] min-h-96 overflow-scroll scroll-m-2 bg-customLightBg dark:bg-customOrangeBg rounded-3xl py-8 md:w-full">
             {cartItems.map((item) => (
               <Fragment key={item.id}>
                 <article className="flex justify-start items-start mb-2 px-4 py-4">
@@ -58,7 +58,7 @@ export default function ReviewStep({
           </article>
         </div>
         <div className="mx-auto flex flex-col justify-start items-center w-full gap-8">
-          <div className="flex items-center justify-between w-full gap-8">
+          <div className="flex items-center justify-between md:w-full gap-8">
             <div>
               <h3 className="text-xl font-semibold mb-2 uppercase">
                 {t("deliveryTitle")}
@@ -109,8 +109,8 @@ export default function ReviewStep({
               </div>
             </div>
           </div>
-          <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700 w-full" />
-          <div className="flex justify-between items-center w-full">
+          <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700 w-full hidden md:inline-block" />
+          <div className="hidden md:flex justify-between items-center w-full">
             <span className="capitalize font-extrabold">{t("total")}</span>
             <span className="font-extrabold text-2xl">
               <span>{totalPriceVal}</span>
