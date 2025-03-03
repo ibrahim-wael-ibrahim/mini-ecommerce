@@ -19,10 +19,7 @@ export default function HeroSection() {
           placeholder={t("heroSection.searchPlaceholder")}
           id="search"
         />
-        <button
-          type="submit"
-          className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white"
-        >
+        <button className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white">
           <BiSearchAlt size={24} />
         </button>
       </div>

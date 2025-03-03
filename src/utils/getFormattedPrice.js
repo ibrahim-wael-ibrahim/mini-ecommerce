@@ -2,7 +2,7 @@ export function getFormattedPriceComponents(price) {
   const formattedPrice = new Intl.NumberFormat("en-IE", {
     style: "currency",
     currency: "EUR",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(price);
 
   const currencySymbol = formattedPrice.charAt(0);

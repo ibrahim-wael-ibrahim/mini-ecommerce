@@ -1,16 +1,17 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BsHandbagFill } from "react-icons/bs";
-import { CgSearch } from "react-icons/cg";
+import { BiSearchAlt } from "react-icons/bi";
+
 import ThemeSwitch from "@/components/atoms/ThemeSwitch";
 import LocaleSwitch from "@/components/atoms/LocaleSwitch";
 import { useTranslations } from "next-intl";
 import BurgerMenu from "@/components/atoms/BurgerMenu";
+import CartCounter from "@/components/atoms/CartCounter";
 
 const navLinks = [
   { url: "/", label: "home" },
-  { url: "/shop", label: "shop" },
+  { url: "/cart", label: "shop" },
 ];
 
 export default function Navbar() {
@@ -22,10 +23,12 @@ export default function Navbar() {
       className={`fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
     >
       <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14 ">
-        <span className="flex  font-agency uppercase font-bold text-2xl">
-          {t("navbar.logo")}
-        </span>
-        <nav className=" items-center justify-between sm:mt-0 gap-4 hidden md:flex ">
+        <Link href="/">
+          <span className="flex  font-agency uppercase font-bold text-2xl">
+            {t("navbar.logo")}
+          </span>
+        </Link>
+        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  w-full">
           {navLinks.map((link) => (
             <Link
               key={link.url}
@@ -41,11 +44,21 @@ export default function Navbar() {
           ))}
         </nav>
         <div className="flex  gap-6 items-center justify-between">
-          <CgSearch size={24} className="md:text-white text-customOrange" />
-          <span className="relative ">
-            <BsHandbagFill size={24} />
-            <span className="absolute -top-0 -right-1  w-3.5 aspect-square bg-customOrange contain-none rounded-full"></span>
-          </span>
+          <Link href="/search" className="relative w-[216px] hidden md:block  ">
+            <input
+              type="text"
+              className="w-[216px] h-[40px] pl-4 pr-10 text-sm text-white bg-white/10 bg-opacity-50 backdrop-blur-sm  rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
+              // placeholder={t("heroSection.searchPlaceholder")}
+              id="search"
+            />
+            <button className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white">
+              <BiSearchAlt size={24} />
+            </button>
+          </Link>
+          <Link href="/search" className="md:hidden ">
+            <BiSearchAlt size={24} />
+          </Link>
+          <CartCounter />
           <ThemeSwitch />
           <LocaleSwitch className="hidden md:block" />
           <BurgerMenu />

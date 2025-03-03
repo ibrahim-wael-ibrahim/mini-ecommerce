@@ -1,0 +1,25 @@
+{
+  "logo": "LOGO",
+  "description": "The advantage of hiring a workspace with us is that gives you comfortable service and all-around facilities.",
+  "services": {
+    "title": "Services",
+    "emailMarketing": "Email Marketing",
+    "campaigns": "Campaigns",
+    "branding": "Branding"
+  },
+  "furniture": {
+    "title": "Furniture",
+    "beds": "Beds",
+    "chair": "Chair",
+    "all": "All"
+  },
+  "followUs": {
+    "title": "Follow Us",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "instagram": "Instagram"
+  },
+  "copyright": "Copyright © 2021",
+  "termsConditions": "Terms & Conditions",
+  "privacyPolicy": "Privacy Policy"
+}

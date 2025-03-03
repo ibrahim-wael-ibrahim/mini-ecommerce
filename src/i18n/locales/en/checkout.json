@@ -1,0 +1,50 @@
+{
+  "progressIndicator": {
+    "steps": {
+      "login": "Login",
+      "data": "Data",
+      "payment": "Payment",
+      "review": "Review"
+    }
+  },
+  "addressStep": {
+    "title": "Shipping Address",
+    "city": "City",
+    "street": "Street Name",
+    "building": "Building Number",
+    "continue": "Continue",
+    "errors": {
+      "cityRequired": "City is required",
+      "streetRequired": "Street is required",
+      "buildingRequired": "Building number is required"
+    }
+  },
+  "paymentStep": {
+    "title": "Payment Method",
+    "cardPayment": "Card Payment",
+    "paypal": "PayPal",
+    "continue": "Continue"
+  },
+  "reviewStep": {
+    "title": "Review Order",
+    "subtitle": "Dear customer, please check your information for accuracy.",
+    "cartTitle": "Your shopping cart ({count})",
+    "cartDescription": "About the chair",
+    "deliveryTitle": "Delivery Address",
+    "paymentTitle": "Payment Method",
+    "paymentSuffix": "Payment",
+    "total": "Total",
+    "edit": "Edit",
+    "buyNow": "Buy Now",
+    "processing": "Processing..."
+  },
+  "successStep": {
+    "title": "Thank you for your order!",
+    "message": "Your order has been placed successfully.",
+    "goToHome": "Go to home"
+  },
+  "checkoutController": {
+    "title": "Your customer data for the order",
+    "subtitle": "Bringing Your Style Home"
+  }
+}

@@ -22,6 +22,7 @@ export default {
         customGreenW: "#DAFFDB",
         customBlue: "#0F2764",
         customLightBg: "#FFF9F1",
+        customControlBg: "#D7D7D7",
       },
     },
   },

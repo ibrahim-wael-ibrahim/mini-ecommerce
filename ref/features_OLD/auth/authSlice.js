@@ -38,7 +38,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
+      // register cases
       .addMatcher(authApiSlice.endpoints.login.matchPending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -61,7 +61,7 @@ const authSlice = createSlice({
         authApiSlice.endpoints.login.matchRejected,
         (state, { error }) => {
           state.status = "failed";
-          state.error = error.message || "Login failed";
+          state.error = error.message || "register failed";
         },
       )
       // Register cases

@@ -1,0 +1,50 @@
+{
+  "progressIndicator": {
+    "steps": {
+      "login": "تسجيل الدخول",
+      "data": "البيانات",
+      "payment": "الدفع",
+      "review": "المراجعة"
+    }
+  },
+  "addressStep": {
+    "title": "عنوان الشحن",
+    "city": "المدينة",
+    "street": "اسم الشارع",
+    "building": "رقم المبنى",
+    "continue": "متابعة",
+    "errors": {
+      "cityRequired": "المدينة مطلوبة",
+      "streetRequired": "الشارع مطلوب",
+      "buildingRequired": "رقم المبنى مطلوب"
+    }
+  },
+  "paymentStep": {
+    "title": "طريقة الدفع",
+    "cardPayment": "الدفع بالبطاقة",
+    "paypal": "باي بال",
+    "continue": "متابعة"
+  },
+  "reviewStep": {
+    "title": "مراجعة الطلب",
+    "subtitle": "عزيزي العميل، يرجى التحقق من دقة معلوماتك.",
+    "cartTitle": "عربة التسوق الخاصة بك ({count})",
+    "cartDescription": "حول الكرسي",
+    "deliveryTitle": "عنوان التوصيل",
+    "paymentTitle": "طريقة الدفع",
+    "paymentSuffix": "دفع",
+    "total": "الإجمالي",
+    "edit": "تعديل",
+    "buyNow": "اشترِ الآن",
+    "processing": "جارٍ المعالجة..."
+  },
+  "successStep": {
+    "title": "شكرًا على طلبك!",
+    "message": "تم تقديم طلبك بنجاح.",
+    "goToHome": "الذهاب إلى الصفحة الرئيسية"
+  },
+  "checkoutController": {
+    "title": "بيانات العميل الخاصة بطلبك",
+    "subtitle": "جلب أسلوبك إلى المنزل"
+  }
+}

@@ -42,8 +42,8 @@ export default function BurgerMenu() {
         )}
       </button>
       <div
-        className={`absolute -top-9 m-auto ltr:-right-[calc(100%)] rtl:-left-[calc(100%)] ${
-          isMenuOpen ? "w-[103vw]" : "w-0"
+        className={`absolute  -top-9 m-auto ltr:-right-[calc(100%)] rtl:-left-[calc(100%)] ${
+          isMenuOpen ? "w-[110dvw]" : "w-0"
         } min-h-screen transition-[width] duration-500 ease-in-out z-20 bg-white dark:bg-black text-black dark:text-white overflow-hidden`}
       >
         {isMenuOpen && (
@@ -58,17 +58,17 @@ export default function BurgerMenu() {
               <span className="font-extrabold text-3xl mb-4 block">
                 {t("burgerMenu.menu")}
               </span>
-              <ul className="text-xl space-y-4">
-                {navLinks.map(({ url, key }) => (
-                  <li
-                    key={url}
-                    className="border-b-2 px-6 py-4 flex items-center justify-start gap-2"
-                  >
-                    {pathname === url && <FaCheck color="#E58411" size={16} />}
-                    <Link href={url}>{t(key)}</Link>
-                  </li>
-                ))}
-              </ul>
+              {/*<ul className="text-xl space-y-4">*/}
+              {/*  {navLinks.map(({ url, key }) => (*/}
+              {/*    <li*/}
+              {/*      key={url}*/}
+              {/*      className="border-b-2 px-6 py-4 flex items-center justify-start gap-2"*/}
+              {/*    >*/}
+              {/*      {pathname === url && <FaCheck color="#E58411" size={16} />}*/}
+              {/*      <Link href={url}>{t(key)}</Link>*/}
+              {/*    </li>*/}
+              {/*  ))}*/}
+              {/*</ul>*/}
             </nav>
 
             {/* Language Section */}

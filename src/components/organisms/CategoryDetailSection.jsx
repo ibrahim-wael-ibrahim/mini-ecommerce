@@ -52,10 +52,11 @@ export default function CategoryDetailSection({ category }) {
         PathSvg="/images/blob/BLOB_4.svg"
         dirX="left"
         dirY="top-[40rem]"
+        className=" hidden md:block"
       />
 
       <article className="flex flex-col justify-start items-start gap-8 ">
-        <Link href="/" className="text-customOrange">
+        <Link href="/" className="text-customOrange hidden md:block">
           <HiArrowLongLeft size={16} />
         </Link>
         <div className="capitalize text-customOrange flex justify-start items-center gap-4">

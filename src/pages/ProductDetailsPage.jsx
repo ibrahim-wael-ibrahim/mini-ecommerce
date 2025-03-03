@@ -4,27 +4,61 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useGetProductByIdQuery } from "@/features/products/productApi";
 import { useCusLocale } from "@/hooks/useCusLocale";
 import { useLanguageRefresh } from "@/hooks/useLanguageRefresh";
-import ImageShape from "@/components/atoms/ImageShape";
 import { HiArrowLongLeft } from "react-icons/hi2";
 import { IoIosArrowForward } from "react-icons/io";
 import fixImageUrl from "@/utils/fixImageUrl";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { getFormattedPriceComponents } from "@/utils/getFormattedPrice";
+import { IoAddCircle } from "react-icons/io5";
+import { HiMiniMinusCircle } from "react-icons/hi2";
+import { GoShareAndroid } from "react-icons/go";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "@/features/cart/cartSlice";
+import { useAddItemToCartMutation } from "@/features/cart/cartApi";
 
 function ProductDetailsPage() {
-  // All hooks must be called at the top level!
   const { locale } = useCusLocale();
   const { id } = useParams();
   const searchParams = useSearchParams();
   const currentLang = searchParams.get("lang");
   const [isMounted, setIsMounted] = useState(false);
   const t = useTranslations("categories");
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth); // Get auth state
+  const [quantity, setQuantity] = useState(1);
+  const [addItemToCart, { isLoading: isAdding }] = useAddItemToCartMutation();
 
-  // This useEffect is now called unconditionally.
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useGetProductByIdQuery({ id, locale });
+
+  const handleAddToCart = async () => {
+    const cartItem = {
+      id: product.id,
+      name: product.title,
+      price: product.discount_price || product.price, // Use discount if available
+      qty: quantity,
+      image: product.productimage[0].link,
+    };
+
+    if (auth.token) {
+      try {
+        await addItemToCart({
+          item_id: product.id,
+          qty: quantity,
+        }).unwrap();
+      } catch (error) {
+        console.error("Add to cart failed:", error);
+        toast.error("Failed to add item to cart.");
+      }
+    } else {
+      dispatch(addItem(cartItem)); // Price is included in cartItem
+    }
+  };
 
   const isLanguageRefreshing = useLanguageRefresh(
     currentLang,
@@ -32,33 +66,15 @@ function ProductDetailsPage() {
     id,
     (id, locale) => `/product/${id}?lang=${locale}`,
   );
-  const {
-    data: product,
-    isLoading,
-    error,
-  } = useGetProductByIdQuery({ id, locale });
 
-  // Conditional rendering based on data states:
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   if (isLanguageRefreshing || isLoading) {
     return (
       <div className="min-h-[80dvh] p-8 mx-10 my-20 flex flex-col justify-center items-center">
         <div role="status">
-          <svg
-            aria-hidden="true"
-            className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-            viewBox="0 0 100 101"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-              fill="currentColor"
-            />
-            <path
-              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-              fill="currentFill"
-            />
-          </svg>
           <span className="sr-only">Loading...</span>
         </div>
       </div>
@@ -72,12 +88,18 @@ function ProductDetailsPage() {
   if (!product) {
     return <p>No product data found</p>;
   }
-
+  const [priceSy, priceVal] = getFormattedPriceComponents(product?.price);
+  const [discountSy, discountVal] = getFormattedPriceComponents(
+    product?.discount_Price,
+  );
   // Render product details.
   return (
     <section className="min-h-[80dvh] p-8 my-32 flex flex-col justify-center items-start container mx-auto">
       <div className="flex flex-col justify-center items-start gap-8 mb-10">
-        <Link href="/" className="text-customOrange">
+        <Link
+          href={`/category/${product.categories[0].id}?lang=${locale}`}
+          className="text-customOrange"
+        >
           <HiArrowLongLeft size={16} />
         </Link>
         <div className="capitalize text-customOrange flex justify-start items-center gap-4">
@@ -91,9 +113,9 @@ function ProductDetailsPage() {
       <section
         className={`min-h-[60dvh] container  transition-opacity duration-500 ${
           isMounted ? "opacity-100" : "opacity-0"
-        } bg-cyan-400 grid grid-cols-2 gap-8`}
+        }  grid grid-cols-2 gap-8`}
       >
-        <article className="w-full h-full bg-red-500 grid grid-cols-2 grid-rows-2 place-content-center gap-1">
+        <article className="w-full h-full  grid grid-cols-2 grid-rows-2 place-content-center gap-1">
           <div className="w-full h-full  col-span-2 bg-customLightBg dark:bg-customOrangeBg">
             <Image
               src={fixImageUrl(product.productimage[0].link)}
@@ -122,12 +144,78 @@ function ProductDetailsPage() {
             />
           </div>
         </article>
-        <article className="w-full h-full bg-red-500"></article>
+        <article className="w-full h-full flex flex-col justify-between items-center ">
+          <div>
+            <div className="flex justify-between items-end mb-8">
+              <span className="text-6xl capitalize font-extrabold">
+                {product.title}
+              </span>
+              {product.price === product.discount_Price ? (
+                <span className="font-extrabold text-3xl flex justify-center items-start gap-2">
+                  <span className="relative text-lg -top-1">{priceSy}</span>
+                  <span className="">{priceVal}</span>
+                </span>
+              ) : (
+                <div className="flex flex-col justify-end items-start font-extrabold">
+                  <span className=" text-md opacity-60 flex justify-center items-start gap-2">
+                    <span className="relative text-lg -top-1">{priceSy}</span>
+                    <span className="line-through">{priceVal}</span>
+                  </span>
+                  <span className=" text-3xl flex justify-center items-start gap-2">
+                    <span className="relative text-lg -top-1">
+                      {discountSy}
+                    </span>
+                    <span className="">{discountVal}</span>
+                  </span>
+                </div>
+              )}
+            </div>
+            <p>{product.description}</p>
+            <p className="py-4  leading-6">
+              {product.information.split("\n\n").map((line, index, arr) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < arr.length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </p>
+          </div>
+          <div className="border-t-2 w-full ">
+            <div className="py-5 flex flex-col justify-between items-center gap-4">
+              <div className="flex justify-between items-center gap-4 w-full">
+                <div className="flex justify-start items-center gap-4 w-full">
+                  <button
+                    onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                    disabled={quantity === 1}
+                  >
+                    <HiMiniMinusCircle size={48} />
+                  </button>
+                  <span className="text-2xl font-bold">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity((prev) => prev + 1)}
+                    disabled={isAdding}
+                  >
+                    <IoAddCircle size={48} />
+                  </button>
+                </div>
+                <div className="text-center text-customOrange">
+                  <GoShareAndroid size={48} />
+                  <span>Share</span>
+                </div>
+              </div>
+              <button
+                className="w-full py-6 capitalize font-extrabold text-3xl rounded-full bg-customOrange"
+                onClick={handleAddToCart}
+                disabled={isAdding}
+              >
+                {isAdding ? "Adding..." : "Add to Cart"}
+              </button>
+            </div>
+          </div>
+        </article>
       </section>
     </section>
   );
 }
 
 export default memo(ProductDetailsPage);
-
-//

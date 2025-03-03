@@ -1,0 +1,25 @@
+{
+  "logo": "شعار",
+  "description": "ميزة استئجار مساحة عمل معنا هي أنها توفر لك خدمة مريحة ومرافق شاملة.",
+  "services": {
+    "title": "الخدمات",
+    "emailMarketing": "التسويق عبر البريد الإلكتروني",
+    "campaigns": "الحملات",
+    "branding": "العلامة التجارية"
+  },
+  "furniture": {
+    "title": "الأثاث",
+    "beds": "الأسرّة",
+    "chair": "كرسي",
+    "all": "الكل"
+  },
+  "followUs": {
+    "title": "تابعنا",
+    "facebook": "فيسبوك",
+    "twitter": "تويتر",
+    "instagram": "إنستغرام"
+  },
+  "copyright": "حقوق الطبع والنشر © 2021",
+  "termsConditions": "الشروط والأحكام",
+  "privacyPolicy": "سياسة الخصوصية"
+}

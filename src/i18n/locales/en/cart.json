@@ -1,0 +1,8 @@
+{
+  "title": "Your Cart",
+  "subtitle": "Review Your Items",
+  "itemsCount": "items ({count})",
+  "total": "Total",
+  "currency": "$",
+  "placeOrder": "Place Order"
+}

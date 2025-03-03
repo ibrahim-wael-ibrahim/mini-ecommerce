@@ -10,7 +10,7 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Login",
+					"name": "SignIn",
 					"event": [
 						{
 							"listen": "test",
@@ -70,7 +70,7 @@
 					},
 					"response": [
 						{
-							"name": "Login",
+							"name": "SignIn",
 							"originalRequest": {
 								"method": "POST",
 								"header": [
