@@ -1,17 +1,10 @@
-Below is a well-structured `README.md` file tailored to your Next.js e-commerce project. It includes an overview, setup
-instructions, features, technologies, file structure, and some code snippets to highlight key aspects of your
-implementation. The style aligns with industry standards, is developer-friendly, and preserves your coding approach as
-seen in the provided files.
-
----
-
 # Mini E-Commerce Web Application
 
 A modern, responsive e-commerce platform built with Next.js 15, featuring product listings, a shopping cart,
 authentication, localization, and theming. This project demonstrates clean code practices, scalability, and a
 user-friendly UI based on a provided Figma design.
 
-Hosted live at: [Your Vercel URL] (replace with your deployed URL)
+Hosted live at: [https://mini-ecommerce-484bd0gfg-ibrahim-waels-projects.vercel.app/]
 
 GitHub Repository: [https://github.com/ibrahim-wael-ibrahim/mini-ecommerce]
 
