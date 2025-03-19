@@ -21,16 +21,16 @@ export default function SignIn({ isPage = true }) {
   const onSubmit = async (data) => {
     try {
       const res = await login(data).unwrap();
+console.log(res);
       dispatch(
         setCredentials({
-          user: res.data.user,
+          user: {
+            name: `${res.data.name} ${res.data.lastname}`,
+            image : res.data.image,
+          },
           token: res.data.token,
         }),
       );
-      // if (localCart.length > 0) {
-      //   await dispatch(syncCart(localCart));
-      //   dispatch(clearCart());
-      // }
       isPage && router.push("/");
     } catch (error) {
       console.error("SignIn failed:", error);

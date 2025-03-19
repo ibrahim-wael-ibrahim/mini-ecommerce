@@ -4,5 +4,6 @@
   "itemsCount": "items ({count})",
   "total": "Total",
   "currency": "$",
-  "placeOrder": "Place Order"
+  "placeOrder": "Place Order",
+  "errorFetchingCart": "Error fetching cart items"
 }

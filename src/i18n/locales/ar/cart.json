@@ -4,5 +4,6 @@
   "itemsCount": "عناصر ({count})",
   "total": "الإجمالي",
   "currency": "$",
-  "placeOrder": "تقديم الطلب"
+  "placeOrder": "تقديم الطلب",
+  "errorFetchingCart": "خطأ في جلب عناصر العربة"
 }

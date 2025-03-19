@@ -41,7 +41,9 @@
   "successStep": {
     "title": "Thank you for your order!",
     "message": "Your order has been placed successfully.",
-    "goToHome": "Go to home"
+    "goToHome": "Go to home",
+    "redirecting": "You will be redirected to the payment page in {count} seconds...",
+    "errorSessionUrl": "Error: Session URL not found."
   },
   "checkoutController": {
     "title": "Your customer data for the order",

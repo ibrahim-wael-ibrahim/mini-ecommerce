@@ -22,13 +22,16 @@ export default function Navbar() {
     <div
       className={`fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
     >
-      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14 ">
-        <Link href="/">
-          <span className="flex  font-agency uppercase font-bold text-2xl">
-            {t("navbar.logo")}
-          </span>
-        </Link>
-        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  w-full">
+      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14  ">
+        <div className="w-3/6">
+          <Link href="/">
+            <span className="flex  font-agency uppercase font-bold text-2xl ">
+              {t("navbar.logo")}
+            </span>
+          </Link>
+        </div>
+
+        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  mx-auto w-full">
           {navLinks.map((link) => (
             <Link
               key={link.url}

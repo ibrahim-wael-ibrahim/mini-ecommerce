@@ -11,11 +11,25 @@ export default function CartPage() {
   const t = useTranslations("cart"); // Fetch translations from cart.json
   const { token } = useSelector((state) => state.auth);
   const localCart = useSelector((state) => state.cart.items);
-  const { data: serverCart = [] } = useGetCartItemsQuery(undefined, {
+  const {
+    data: serverCart = [],
+    isError,
+    error,
+  } = useGetCartItemsQuery(undefined, {
     skip: !token, // Skips the query in guest mode (no token)
   });
   const { data: orderPrice } = useGetOrderPriceQuery();
+  console.log(orderPrice);
   const cartItems = token ? serverCart : localCart;
+  if (token && isError) {
+    return (
+      <section className="min-h-[80dvh] p-8 my-40 flex flex-col justify-center items-center container mx-auto">
+        <p className="text-red-500 font-bold">
+          {t("errorFetchingCart")}: {error?.message || "Unknown error"}
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="min-h-[80dvh] p-8 my-40 flex flex-col justify-start items-center container mx-auto">

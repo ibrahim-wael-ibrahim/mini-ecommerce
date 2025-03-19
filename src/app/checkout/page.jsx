@@ -20,7 +20,7 @@ import BlobShape from "@/components/atoms/BlobShape";
 import { useTranslations } from "next-intl";
 
 const CheckoutController = () => {
-  const t = useTranslations("checkout.checkoutController");
+  const t = useTranslations("checkout");
   const [currentStep, setCurrentStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [shippingAddress, setShippingAddress] = useState({
@@ -28,6 +28,7 @@ const CheckoutController = () => {
     street: "",
     building: "",
   });
+  const [sessionUrl, setSessionUrl] = useState(null); // New state for session_url
 
   const { token } = useSelector((state) => state.auth);
   const localCart = useSelector((state) => state.cart.items);
@@ -37,10 +38,10 @@ const CheckoutController = () => {
   const { data: orderPrice } = useGetOrderPriceQuery();
   const [createOrder, { isLoading }] = useCreateOrderMutation();
   const [clearCart] = useClearCartMutation();
-
+  console.log(orderPrice);
   const cartItems = token ? serverCart : localCart;
   const [totalPriceS, totalPriceVal] = getFormattedPriceComponents(
-    orderPrice?.data?.grand_total || 0,
+    orderPrice?.data.grand_total,
   );
 
   const handleLoginSuccess = () => setCurrentStep(2);
@@ -60,7 +61,8 @@ const CheckoutController = () => {
         shipping_state: shippingAddress.city,
         payment_method: paymentMethod,
       };
-      await createOrder(orderData).unwrap();
+      const res = await createOrder(orderData).unwrap();
+      res?.data?.session_url && setSessionUrl(res?.data?.session_url);
       await clearCart().unwrap();
       setCurrentStep(5);
     } catch (error) {
@@ -101,7 +103,7 @@ const CheckoutController = () => {
           />
         );
       case 5:
-        return <SuccessStep />;
+        return <SuccessStep sessionUrl={sessionUrl} />; // Pass sessionUrl to SuccessStep
       default:
         return <LoginStep onSuccess={handleLoginSuccess} />;
     }
@@ -116,9 +118,11 @@ const CheckoutController = () => {
             <div className="flex flex-col justify-start items-center w-full gap-2">
               <span className="w-full min-h-[0.1px] bg-customControlBg/60 mb-8" />
               <h1 className="text-5xl font-extrabold capitalize">
-                {t("title")}
+                {t("checkoutController.title")}
               </h1>
-              <p className="opacity-60 capitalize">{t("subtitle")}</p>
+              <p className="opacity-60 capitalize">
+                {t("checkoutController.subtitle")}
+              </p>
             </div>
           </>
         )}

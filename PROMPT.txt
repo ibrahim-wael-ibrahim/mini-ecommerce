@@ -216,6 +216,7 @@ src
 │   │   ├── BurgerMenu.jsx
 │   │   ├── CartCounter.jsx
 │   │   ├── CartSync.jsx
+│   │   ├── CustomGoogleLoginButton.jsx
 │   │   ├── GoogleLoginButton.jsx
 │   │   ├── ImageShape.jsx
 │   │   ├── LocaleSwitch.jsx
@@ -297,9 +298,411 @@ src
     ├── getFormattedPrice.js
     └── productTitle.js
 
-30 directories, 78 files
+30 directories, 79 files
 
 ======= Appending src file contents =======
+
+File: src/app/Providers.jsx
+------------------------
+// app/providers.jsx
+"use client";
+
+import { ThemeProvider } from "next-themes";
+import { useRef, useEffect, useState } from "react";
+import { Provider } from "react-redux";
+import { makeStore } from "@/store";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { Toaster } from "sonner";
+
+export function Providers({ children }) {
+  const storeRef = useRef(undefined);
+  const [mounted, setMounted] = useState(false);
+  if (!storeRef.current) {
+    storeRef.current = makeStore();
+  }
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null; // Prevent SSR mismatch
+
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <Provider store={storeRef.current}>
+        <GoogleOAuthProvider
+          authorizationParams={{
+            redirect_uri: "https://test-ecomerce.hrt-wü.de/api/auth/callback",
+            audience: "https://test-ecomerce.hrt-wü.de/api/v2/",
+          }}
+          clientId="939457397098-af0i8monehvqgrhr4rad4cvrk93kq1k7.apps.googleusercontent.com"
+        >
+          {children}
+        </GoogleOAuthProvider>
+        <Toaster position="bottom-right" richColors />
+      </Provider>
+    </ThemeProvider>
+  );
+}
+
+__________
+
+File: src/app/cart/page.jsx
+------------------------
+"use client";
+import { useSelector } from "react-redux";
+import { useGetCartItemsQuery } from "@/features/cart/cartApi";
+import { useGetOrderPriceQuery } from "@/features/order/orderApi";
+import BlobShape from "@/components/atoms/BlobShape";
+import Link from "next/link";
+import CartItems from "@/components/molecules/CartItems";
+import { useTranslations } from "next-intl";
+
+export default function CartPage() {
+  const t = useTranslations("cart"); // Fetch translations from cart.json
+  const { token } = useSelector((state) => state.auth);
+  const localCart = useSelector((state) => state.cart.items);
+  const {
+    data: serverCart = [],
+    isError,
+    error,
+  } = useGetCartItemsQuery(undefined, {
+    skip: !token, // Skips the query in guest mode (no token)
+  });
+  const { data: orderPrice } = useGetOrderPriceQuery();
+  console.log(orderPrice);
+  const cartItems = token ? serverCart : localCart;
+  if (token && isError) {
+    return (
+      <section className="min-h-[80dvh] p-8 my-40 flex flex-col justify-center items-center container mx-auto">
+        <p className="text-red-500 font-bold">
+          {t("errorFetchingCart")}: {error?.message || "Unknown error"}
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="min-h-[80dvh] p-8 my-40 flex flex-col justify-start items-center container mx-auto">
+      <article className="relative mx-auto flex flex-col justify-start items-center">
+        <div className="absolute w-full mx-auto left-0 right-0">
+          <BlobShape
+            PathSvg="/images/blob/BLOB_7.svg"
+            dirY="-bottom-4"
+            className="-ml-10"
+          />
+        </div>
+        <div className="z-10 bottom-1 left-0.5 text-center mb-16">
+          <h1 className="text-5xl capitalize font-extrabold w-[250px] rtl:w-[350px]">
+            {t("title")}
+          </h1>
+          <p>{t("subtitle")}</p>
+        </div>
+        <span className="font-extrabold capitalize text-center text-2xl">
+          {t("itemsCount", { count: cartItems.length })}
+        </span>
+      </article>
+      <article className="max-w-[787px] w-full h-full max-h-[727px] overflow-scroll flex flex-col justify-start items-center gap-2 pb-32 mt-24 hero-container">
+        {cartItems.length > 0 &&
+          cartItems.map((cartItem) => (
+            <CartItems item={cartItem} key={cartItem.id} />
+          ))}
+      </article>
+      <div className="flex flex-col justify-end items-center gap-6 w-full py-10">
+        <div className="w-full flex justify-between items-center font-extrabold capitalize">
+          <span>{t("total")}</span>
+          <span>
+            {orderPrice?.data?.grand_total} {t("currency")}
+          </span>
+        </div>
+        <Link
+          href="/checkout"
+          className="bg-customOrange text-white px-4 py-4 mt-8 rounded-3xl font-extrabold w-full text-center"
+        >
+          {t("placeOrder")}
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+__________
+
+File: src/app/category/[id]/page.jsx
+------------------------
+import fixImageUrl from "@/utils/fixImageUrl";
+import CategoryDetailsPage from "@/components/organisms/CategoryDetailsPage";
+
+export const revalidate = 360;
+
+export async function generateStaticParams() {
+  const apiUrl = "https://test-ecomerce.xn--hrt-w-ova.de/api/category/get";
+  try {
+    const res = await fetch(apiUrl, {
+      headers: {
+        "Accept-Language": "en",
+        Accept: "application/json",
+        "User-Type": "personal",
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`);
+    const json = await res.json();
+    const categories = json.data || [];
+    return categories.map((category) => ({
+      id: category.id.toString(),
+    }));
+  } catch (error) {
+    console.error("Error in generateStaticParams:", error);
+    return [{ id: "5" }, { id: "6" }, { id: "7" }];
+  }
+}
+
+export async function generateMetadata({ params, searchParams }) {
+  const { id } = await params; // Await params
+  const { lang } = await searchParams; // Await searchParams
+
+  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
+  try {
+    const res = await fetch(apiUrl, {
+      headers: {
+        "Accept-Language": lang || "en",
+      },
+    });
+    if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+    const json = await res.json();
+    const category = json.data;
+    const ogImageUrl = fixImageUrl(category.image);
+
+    return {
+      title: category.title,
+      description: category.description,
+      openGraph: {
+        title: category.title,
+        description: category.description,
+        images: [ogImageUrl],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: category.title,
+        description: category.description,
+        images: [ogImageUrl],
+      },
+    };
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+    return {
+      title: "Category",
+      description: "Default category description",
+    };
+  }
+}
+
+export async function getCategoryData(id, locale) {
+  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
+  try {
+    const res = await fetch(apiUrl, {
+      headers: {
+        "Accept-Language": locale || "en",
+        Accept: "application/json",
+        "User-Type": "personal",
+      },
+    });
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error(`Failed to fetch category: ${res.status}`);
+    }
+    const json = await res.json();
+    return json.data;
+  } catch (error) {
+    console.error("Error fetching category data:", error);
+    return null;
+  }
+}
+
+export default async function Page({ params, searchParams }) {
+  const { id } = await params; // Await params
+  const { lang } = await searchParams; // Await searchParams
+  const category = await getCategoryData(id, lang);
+
+  if (!category) {
+    return { notFound: true };
+  }
+
+  return <CategoryDetailsPage params={{ id }} initialCategory={category} />;
+}
+
+__________
+
+File: src/app/checkout/page.jsx
+------------------------
+"use client";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import {
+  useCreateOrderMutation,
+  useGetOrderPriceQuery,
+} from "@/features/order/orderApi";
+import {
+  useGetCartItemsQuery,
+  useClearCartMutation,
+} from "@/features/cart/cartApi";
+import ProgressIndicator from "@/components/checkout/ProgressIndicator";
+import LoginStep from "@/components/checkout/LoginStep";
+import AddressStep from "@/components/checkout/AddressStep";
+import PaymentStep from "@/components/checkout/PaymentStep";
+import ReviewStep from "@/components/checkout/ReviewStep";
+import SuccessStep from "@/components/checkout/SuccessStep";
+import { getFormattedPriceComponents } from "@/utils/getFormattedPrice";
+import BlobShape from "@/components/atoms/BlobShape";
+import { useTranslations } from "next-intl";
+
+const CheckoutController = () => {
+  const t = useTranslations("checkout");
+  const [currentStep, setCurrentStep] = useState(1);
+  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [shippingAddress, setShippingAddress] = useState({
+    city: "",
+    street: "",
+    building: "",
+  });
+  const [sessionUrl, setSessionUrl] = useState(null); // New state for session_url
+
+  const { token } = useSelector((state) => state.auth);
+  const localCart = useSelector((state) => state.cart.items);
+  const { data: serverCart = [] } = useGetCartItemsQuery(undefined, {
+    skip: !token,
+  });
+  const { data: orderPrice } = useGetOrderPriceQuery();
+  const [createOrder, { isLoading }] = useCreateOrderMutation();
+  const [clearCart] = useClearCartMutation();
+  console.log(orderPrice);
+  const cartItems = token ? serverCart : localCart;
+  const [totalPriceS, totalPriceVal] = getFormattedPriceComponents(
+    orderPrice?.data.grand_total,
+  );
+
+  const handleLoginSuccess = () => setCurrentStep(2);
+  const handleAddressSubmit = (data) => {
+    setShippingAddress(data);
+    setCurrentStep(3);
+  };
+  const handlePaymentSubmit = () => setCurrentStep(4);
+  const handleEditAddress = () => setCurrentStep(2);
+  const handleEditPayment = () => setCurrentStep(3);
+
+  const handleCreateOrder = async () => {
+    try {
+      const orderData = {
+        shipping_street_address: `${shippingAddress.street}, ${shippingAddress.building}`,
+        shipping_country: "Egypt",
+        shipping_state: shippingAddress.city,
+        payment_method: paymentMethod,
+      };
+      const res = await createOrder(orderData).unwrap();
+      res?.data?.session_url && setSessionUrl(res?.data?.session_url);
+      await clearCart().unwrap();
+      setCurrentStep(5);
+    } catch (error) {
+      console.error("Order creation failed:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (token && currentStep === 1) setCurrentStep(2);
+  }, [token]);
+
+  const getStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return <LoginStep onSuccess={handleLoginSuccess} />;
+      case 2:
+        return <AddressStep onSubmit={handleAddressSubmit} />;
+      case 3:
+        return (
+          <PaymentStep
+            method={paymentMethod}
+            onMethodChange={setPaymentMethod}
+            onSubmit={handlePaymentSubmit}
+          />
+        );
+      case 4:
+        return (
+          <ReviewStep
+            cartItems={cartItems}
+            shippingAddress={shippingAddress}
+            paymentMethod={paymentMethod}
+            totalPriceS={totalPriceS}
+            totalPriceVal={totalPriceVal}
+            onEditAddress={handleEditAddress}
+            onEditPayment={handleEditPayment}
+            onCreateOrder={handleCreateOrder}
+            isLoading={isLoading}
+          />
+        );
+      case 5:
+        return <SuccessStep sessionUrl={sessionUrl} />; // Pass sessionUrl to SuccessStep
+      default:
+        return <LoginStep onSuccess={handleLoginSuccess} />;
+    }
+  };
+
+  return (
+    <section className="min-h-[80dvh] p-8 my-28 flex flex-col justify-start items-center mx-auto container">
+      <div className="mx-auto px-4 py-8 w-full">
+        {currentStep < 5 && (
+          <>
+            <ProgressIndicator currentStep={currentStep} />
+            <div className="flex flex-col justify-start items-center w-full gap-2">
+              <span className="w-full min-h-[0.1px] bg-customControlBg/60 mb-8" />
+              <h1 className="text-5xl font-extrabold capitalize">
+                {t("checkoutController.title")}
+              </h1>
+              <p className="opacity-60 capitalize">
+                {t("checkoutController.subtitle")}
+              </p>
+            </div>
+          </>
+        )}
+        <section className="mx-auto my-8 w-full container">
+          {getStepContent()}
+        </section>
+      </div>
+      <BlobShape
+        PathSvg="/images/blob/BLOB_8.svg"
+        dirX="right"
+        dirY="top-1/4"
+      />
+      <BlobShape PathSvg="/images/blob/BLOB_9.svg" dirX="left" dirY="top-2/4" />
+    </section>
+  );
+};
+
+export default CheckoutController;
+
+__________
+
+File: src/app/globals.css
+------------------------
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+    @apply bg-white text-black dark:bg-[#0B0C0C] dark:text-white rtl:font-cairo ltr:font-gilroy;
+}
+
+::-webkit-scrollbar {
+    @apply w-0.5  ;
+}
+
+
+::-webkit-scrollbar-thumb {
+    @apply bg-customOrange;
+}
+
+.hero-container {
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0) 99%);
+}
+
+
+__________
 
 File: src/app/layout.js
 ------------------------
@@ -446,179 +849,6 @@ export default function Home() {
 
 __________
 
-File: src/app/globals.css
-------------------------
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-
-body {
-    @apply bg-white text-black dark:bg-[#0B0C0C] dark:text-white rtl:font-cairo ltr:font-gilroy;
-}
-
-::-webkit-scrollbar {
-    @apply w-0.5  ;
-}
-
-
-::-webkit-scrollbar-thumb {
-    @apply bg-customOrange;
-}
-
-.hero-container {
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 60%, rgba(0, 0, 0, 0) 99%);
-}
-
-
-__________
-
-File: src/app/Providers.jsx
-------------------------
-// app/providers.jsx
-"use client";
-
-import { ThemeProvider } from "next-themes";
-import { useRef, useEffect, useState } from "react";
-import { Provider } from "react-redux";
-import { makeStore } from "@/store";
-import { GoogleOAuthProvider } from "@react-oauth/google";
-import { Toaster } from "sonner";
-
-export function Providers({ children }) {
-  const storeRef = useRef(undefined);
-  const [mounted, setMounted] = useState(false);
-  if (!storeRef.current) {
-    storeRef.current = makeStore();
-  }
-  useEffect(() => setMounted(true), []);
-  if (!mounted) return null; // Prevent SSR mismatch
-
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <Provider store={storeRef.current}>
-        <GoogleOAuthProvider
-          authorizationParams={{
-            redirect_uri: "https://test-ecomerce.hrt-wü.de/api/auth/callback",
-            audience: "https://test-ecomerce.hrt-wü.de/api/v2/",
-          }}
-          clientId="939457397098-af0i8monehvqgrhr4rad4cvrk93kq1k7.apps.googleusercontent.com"
-        >
-          {children}
-        </GoogleOAuthProvider>
-        <Toaster position="bottom-right" richColors />
-      </Provider>
-    </ThemeProvider>
-  );
-}
-
-__________
-
-File: src/app/category/[id]/page.jsx
-------------------------
-import fixImageUrl from "@/utils/fixImageUrl";
-import CategoryDetailsPage from "@/components/organisms/CategoryDetailsPage";
-
-export const revalidate = 360;
-
-export async function generateStaticParams() {
-  const apiUrl = "https://test-ecomerce.xn--hrt-w-ova.de/api/category/get";
-  try {
-    const res = await fetch(apiUrl, {
-      headers: {
-        "Accept-Language": "en",
-        Accept: "application/json",
-        "User-Type": "personal",
-      },
-    });
-    if (!res.ok) throw new Error(`Failed to fetch categories: ${res.status}`);
-    const json = await res.json();
-    const categories = json.data || [];
-    return categories.map((category) => ({
-      id: category.id.toString(),
-    }));
-  } catch (error) {
-    console.error("Error in generateStaticParams:", error);
-    return [{ id: "5" }, { id: "6" }, { id: "7" }];
-  }
-}
-
-export async function generateMetadata({ params, searchParams }) {
-  const { id } = await params; // Await params
-  const { lang } = await searchParams; // Await searchParams
-
-  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
-  try {
-    const res = await fetch(apiUrl, {
-      headers: {
-        "Accept-Language": lang || "en",
-      },
-    });
-    if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-    const json = await res.json();
-    const category = json.data;
-    const ogImageUrl = fixImageUrl(category.image);
-
-    return {
-      title: category.title,
-      description: category.description,
-      openGraph: {
-        title: category.title,
-        description: category.description,
-        images: [ogImageUrl],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: category.title,
-        description: category.description,
-        images: [ogImageUrl],
-      },
-    };
-  } catch (error) {
-    console.error("Error generating metadata:", error);
-    return {
-      title: "Category",
-      description: "Default category description",
-    };
-  }
-}
-
-export async function getCategoryData(id, locale) {
-  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
-  try {
-    const res = await fetch(apiUrl, {
-      headers: {
-        "Accept-Language": locale || "en",
-        Accept: "application/json",
-        "User-Type": "personal",
-      },
-    });
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error(`Failed to fetch category: ${res.status}`);
-    }
-    const json = await res.json();
-    return json.data;
-  } catch (error) {
-    console.error("Error fetching category data:", error);
-    return null;
-  }
-}
-
-export default async function Page({ params, searchParams }) {
-  const { id } = await params; // Await params
-  const { lang } = await searchParams; // Await searchParams
-  const category = await getCategoryData(id, lang);
-
-  if (!category) {
-    return { notFound: true };
-  }
-
-  return <CategoryDetailsPage params={{ id }} initialCategory={category} />;
-}
-
-__________
-
 File: src/app/product/[id]/page.jsx
 ------------------------
 import fixImageUrl from "@/utils/fixImageUrl";
@@ -748,217 +978,6 @@ export default function Register() {
 
 __________
 
-File: src/app/cart/page.jsx
-------------------------
-"use client";
-import { useSelector } from "react-redux";
-import { useGetCartItemsQuery } from "@/features/cart/cartApi";
-import { useGetOrderPriceQuery } from "@/features/order/orderApi";
-import BlobShape from "@/components/atoms/BlobShape";
-import Link from "next/link";
-import CartItems from "@/components/molecules/CartItems";
-import { useTranslations } from "next-intl";
-
-export default function CartPage() {
-  const t = useTranslations("cart"); // Fetch translations from cart.json
-  const { token } = useSelector((state) => state.auth);
-  const localCart = useSelector((state) => state.cart.items);
-  const { data: serverCart = [] } = useGetCartItemsQuery(undefined, {
-    skip: !token, // Skips the query in guest mode (no token)
-  });
-  const { data: orderPrice } = useGetOrderPriceQuery();
-  const cartItems = token ? serverCart : localCart;
-
-  return (
-    <section className="min-h-[80dvh] p-8 my-40 flex flex-col justify-start items-center container mx-auto">
-      <article className="relative mx-auto flex flex-col justify-start items-center">
-        <div className="absolute w-full mx-auto left-0 right-0">
-          <BlobShape
-            PathSvg="/images/blob/BLOB_7.svg"
-            dirY="-bottom-4"
-            className="-ml-10"
-          />
-        </div>
-        <div className="z-10 bottom-1 left-0.5 text-center mb-16">
-          <h1 className="text-5xl capitalize font-extrabold w-[250px] rtl:w-[350px]">
-            {t("title")}
-          </h1>
-          <p>{t("subtitle")}</p>
-        </div>
-        <span className="font-extrabold capitalize text-center text-2xl">
-          {t("itemsCount", { count: cartItems.length })}
-        </span>
-      </article>
-      <article className="max-w-[787px] w-full h-full max-h-[727px] overflow-scroll flex flex-col justify-start items-center gap-2 pb-32 mt-24 hero-container">
-        {cartItems.length > 0 &&
-          cartItems.map((cartItem) => (
-            <CartItems item={cartItem} key={cartItem.id} />
-          ))}
-      </article>
-      <div className="flex flex-col justify-end items-center gap-6 w-full py-10">
-        <div className="w-full flex justify-between items-center font-extrabold capitalize">
-          <span>{t("total")}</span>
-          <span>
-            {orderPrice?.data?.grand_total} {t("currency")}
-          </span>
-        </div>
-        <Link
-          href="/checkout"
-          className="bg-customOrange text-white px-4 py-4 mt-8 rounded-3xl font-extrabold w-full text-center"
-        >
-          {t("placeOrder")}
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-__________
-
-File: src/app/checkout/page.jsx
-------------------------
-"use client";
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import {
-  useCreateOrderMutation,
-  useGetOrderPriceQuery,
-} from "@/features/order/orderApi";
-import {
-  useGetCartItemsQuery,
-  useClearCartMutation,
-} from "@/features/cart/cartApi";
-import ProgressIndicator from "@/components/checkout/ProgressIndicator";
-import LoginStep from "@/components/checkout/LoginStep";
-import AddressStep from "@/components/checkout/AddressStep";
-import PaymentStep from "@/components/checkout/PaymentStep";
-import ReviewStep from "@/components/checkout/ReviewStep";
-import SuccessStep from "@/components/checkout/SuccessStep";
-import { getFormattedPriceComponents } from "@/utils/getFormattedPrice";
-import BlobShape from "@/components/atoms/BlobShape";
-import { useTranslations } from "next-intl";
-
-const CheckoutController = () => {
-  const t = useTranslations("checkout.checkoutController");
-  const [currentStep, setCurrentStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState("card");
-  const [shippingAddress, setShippingAddress] = useState({
-    city: "",
-    street: "",
-    building: "",
-  });
-
-  const { token } = useSelector((state) => state.auth);
-  const localCart = useSelector((state) => state.cart.items);
-  const { data: serverCart = [] } = useGetCartItemsQuery(undefined, {
-    skip: !token,
-  });
-  const { data: orderPrice } = useGetOrderPriceQuery();
-  const [createOrder, { isLoading }] = useCreateOrderMutation();
-  const [clearCart] = useClearCartMutation();
-
-  const cartItems = token ? serverCart : localCart;
-  const [totalPriceS, totalPriceVal] = getFormattedPriceComponents(
-    orderPrice?.data?.grand_total || 0,
-  );
-
-  const handleLoginSuccess = () => setCurrentStep(2);
-  const handleAddressSubmit = (data) => {
-    setShippingAddress(data);
-    setCurrentStep(3);
-  };
-  const handlePaymentSubmit = () => setCurrentStep(4);
-  const handleEditAddress = () => setCurrentStep(2);
-  const handleEditPayment = () => setCurrentStep(3);
-
-  const handleCreateOrder = async () => {
-    try {
-      const orderData = {
-        shipping_street_address: `${shippingAddress.street}, ${shippingAddress.building}`,
-        shipping_country: "Egypt",
-        shipping_state: shippingAddress.city,
-        payment_method: paymentMethod,
-      };
-      await createOrder(orderData).unwrap();
-      await clearCart().unwrap();
-      setCurrentStep(5);
-    } catch (error) {
-      console.error("Order creation failed:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (token && currentStep === 1) setCurrentStep(2);
-  }, [token]);
-
-  const getStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return <LoginStep onSuccess={handleLoginSuccess} />;
-      case 2:
-        return <AddressStep onSubmit={handleAddressSubmit} />;
-      case 3:
-        return (
-          <PaymentStep
-            method={paymentMethod}
-            onMethodChange={setPaymentMethod}
-            onSubmit={handlePaymentSubmit}
-          />
-        );
-      case 4:
-        return (
-          <ReviewStep
-            cartItems={cartItems}
-            shippingAddress={shippingAddress}
-            paymentMethod={paymentMethod}
-            totalPriceS={totalPriceS}
-            totalPriceVal={totalPriceVal}
-            onEditAddress={handleEditAddress}
-            onEditPayment={handleEditPayment}
-            onCreateOrder={handleCreateOrder}
-            isLoading={isLoading}
-          />
-        );
-      case 5:
-        return <SuccessStep />;
-      default:
-        return <LoginStep onSuccess={handleLoginSuccess} />;
-    }
-  };
-
-  return (
-    <section className="min-h-[80dvh] p-8 my-28 flex flex-col justify-start items-center mx-auto container">
-      <div className="mx-auto px-4 py-8 w-full">
-        {currentStep < 5 && (
-          <>
-            <ProgressIndicator currentStep={currentStep} />
-            <div className="flex flex-col justify-start items-center w-full gap-2">
-              <span className="w-full min-h-[0.1px] bg-customControlBg/60 mb-8" />
-              <h1 className="text-5xl font-extrabold capitalize">
-                {t("title")}
-              </h1>
-              <p className="opacity-60 capitalize">{t("subtitle")}</p>
-            </div>
-          </>
-        )}
-        <section className="mx-auto my-8 w-full container">
-          {getStepContent()}
-        </section>
-      </div>
-      <BlobShape
-        PathSvg="/images/blob/BLOB_8.svg"
-        dirX="right"
-        dirY="top-1/4"
-      />
-      <BlobShape PathSvg="/images/blob/BLOB_9.svg" dirX="left" dirY="top-2/4" />
-    </section>
-  );
-};
-
-export default CheckoutController;
-
-__________
-
 File: src/app/search/page.jsx
 ------------------------
 "use client";
@@ -1037,88 +1056,35 @@ export default function Search() {
 
 __________
 
-File: src/components/atoms/ThemeSwitch.jsx
+File: src/components/atoms/BlobShape.jsx
 ------------------------
-// ThemeSwitch.js
-"use client";
-import { IoSunny, IoMoon } from "react-icons/io5";
-import { useThemeSwitch } from "@/hooks/useThemeSwitch";
 import Image from "next/image";
 
-export default function ThemeSwitch() {
-  const { isMounted, resolvedTheme, toggleTheme } = useThemeSwitch();
-
-  // Loading state while waiting for hydration
-  if (!isMounted) {
-    return (
-      <div className="h-8 bg-gray-200  dark:bg-gray-700 w-8 rounded-lg"></div>
-    );
-  }
-
-  // Render the appropriate icon based on the current theme
-  if (resolvedTheme === "dark") {
-    return (
-      <IoSunny
-        size={24}
-        className="text-customOrange hidden md:block cursor-pointer"
-        onClick={toggleTheme}
-        title="Switch to Light Mode"
-      />
-    );
-  }
-
-  if (resolvedTheme === "light") {
-    return (
-      <IoMoon
-        size={24}
-        className="hidden md:block cursor-pointer"
-        onClick={toggleTheme}
-        title="Switch to Dark Mode"
-      />
-    );
-  }
-
-  return null; // Fallback in case resolvedTheme is undefined
-}
-
-__________
-
-File: src/components/atoms/LocaleSwitch.jsx
-------------------------
-"use client";
-import { useState, useEffect } from "react";
-import { useCusLocale } from "@/hooks/useCusLocale";
-import Image from "next/image";
-
-export default function LocaleSwitch() {
-  const [mounted, setMounted] = useState(false);
-  const { locale, updateLocale } = useCusLocale();
-
-  // Ensure hydration is complete before rendering
-  useEffect(() => setMounted(true), []);
-  if (!mounted) {
-    return (
-      <div className="h-8 bg-gray-200 dark:bg-gray-700 w-12 rounded-lg"></div>
-    );
-  }
-
-  // Toggle between 'ar' and 'en'
-  const targetLocale = locale === "ar" ? "en" : "ar";
-  const iconPath = `/images/${targetLocale.toUpperCase()}_ICON.svg`;
-
+export default function BlobShape({
+  PathSvg,
+  dirY = "top-20",
+  dirX = "left",
+  className,
+}) {
   return (
-    <button
-      onClick={() => updateLocale(targetLocale)}
-      className="hidden md:flex items-center gap-2 p-2 rounded"
-    >
+    <div className={`absolute ${dirY} ${dirX}-0 w-[330px] ${className} -z-[1]`}>
       <Image
-        src={iconPath}
-        alt={`${targetLocale.toUpperCase()} Language`}
-        width={24}
-        height={24}
+        src={PathSvg}
+        width={0}
+        height={0}
+        style={{ width: "auto", height: "auto" }}
+        alt="BlobShape"
+        className={`absolute -z-0 opacity-60 top-0 bottom-0 my-auto ${dirX}-0 scale-110`}
       />
-      <span>{targetLocale.toUpperCase()}</span>
-    </button>
+      <Image
+        src={PathSvg}
+        width={0}
+        height={0}
+        style={{ width: "auto", height: "auto" }}
+        alt="BlobShape"
+        className={`absolute top-0 bottom-0 my-auto ${dirX}-0`}
+      />
+    </div>
   );
 }
 
@@ -1277,129 +1243,33 @@ export default function BurgerMenu() {
 
 __________
 
-File: src/components/atoms/MoreInfo.jsx
+File: src/components/atoms/CartCounter.jsx
 ------------------------
+// src/components/atoms/CartCounter.jsx
+"use client";
+import { useSelector } from "react-redux";
+import { useGetCartItemsQuery } from "@/features/cart/cartApi";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { HiArrowLongRight } from "react-icons/hi2";
+import { BsHandbagFill } from "react-icons/bs";
 
-export default function MoreInfo({ link }) {
-  const t = useTranslations("molecules");
+export default function CartCounter() {
+  const { token } = useSelector((state) => state.auth);
+  const localCart = useSelector((state) => state.cart.items);
+  const { data: serverCart = [] } = useGetCartItemsQuery(undefined, {
+    skip: !token,
+  });
+
+  const cartItems = token ? serverCart : localCart;
+
   return (
-    <Link
-      href={link}
-      className="text-customOrange capitalize flex  items-center gap-4"
-    >
-      {t("moreInfo")}{" "}
-      <span>
-        {" "}
-        <HiArrowLongRight size={20} className="rtl:rotate-180" />
+    <Link href="/cart">
+      <span className="relative">
+        <BsHandbagFill size={24} />
+        <span className="absolute -top-2 -right-2 min-w-5 text-center text-sm aspect-square bg-customOrange contain-none rounded-full">
+          {cartItems.length}
+        </span>
       </span>
     </Link>
-  );
-}
-
-__________
-
-File: src/components/atoms/BlobShape.jsx
-------------------------
-import Image from "next/image";
-
-export default function BlobShape({
-  PathSvg,
-  dirY = "top-20",
-  dirX = "left",
-  className,
-}) {
-  return (
-    <div className={`absolute ${dirY} ${dirX}-0 w-[330px] ${className} -z-[1]`}>
-      <Image
-        src={PathSvg}
-        width={0}
-        height={0}
-        style={{ width: "auto", height: "auto" }}
-        alt="BlobShape"
-        className={`absolute -z-0 opacity-60 top-0 bottom-0 my-auto ${dirX}-0 scale-110`}
-      />
-      <Image
-        src={PathSvg}
-        width={0}
-        height={0}
-        style={{ width: "auto", height: "auto" }}
-        alt="BlobShape"
-        className={`absolute top-0 bottom-0 my-auto ${dirX}-0`}
-      />
-    </div>
-  );
-}
-
-__________
-
-File: src/components/atoms/ImageShape.jsx
-------------------------
-import Image from "next/image";
-import React from "react";
-
-export default function ImageShape({
-  id,
-  alt,
-  image,
-  className,
-  leftShapeClassName,
-  rightShapeClassName,
-}) {
-  return (
-    <article
-      className={`relative  flex flex-col  justify-center w-[408px] h-[303px] md:w-[728px] md:h-[541px] p-8 ${className}`}
-      id={id}
-    >
-      <div
-        className={`${leftShapeClassName} w-[277px] md:w-[495px] h-[236px] md:h-[422px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl absolute md:-left-4 md:-top-12 -left-1 -top-2`}
-      />
-      <div
-        className={`${rightShapeClassName} w-[277px] md:w-[495px] h-[169px] md:h-[301px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl absolute md:top-0 md:bottom-0 my-auto md:-right-10 -right-2`}
-      />
-      <div className="relative  aspect-video flex flex-col w-full h-full p-4 overflow-hidden  rounded-2xl ">
-        <Image
-          src={image}
-          alt={alt}
-          width={0}
-          height={0}
-          fill
-          sizes="auto"
-          style={{ width: "100%", height: "100%" }}
-          quality="100"
-          className="absolute z-10  object-center object-cover  "
-          priority
-        />
-      </div>
-    </article>
-  );
-}
-
-__________
-
-File: src/components/atoms/GoogleLoginButton.jsx
-------------------------
-// src/components/atoms/GoogleLoginButton.jsx
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
-export default function GoogleLoginButton({ onSuccess }) {
-  return (
-    <GoogleLogin
-      onSuccess={(credentialResponse) => {
-        const decoded = jwtDecode(credentialResponse.credential);
-        onSuccess({
-          token: credentialResponse.credential,
-          email: decoded.email,
-          firstName: decoded.given_name,
-          lastName: decoded.family_name,
-        });
-      }}
-      onError={() => console.log("Login Failed")}
-      useOneTap
-    />
   );
 }
 
@@ -1458,31 +1328,134 @@ export default function CartSync() {
 
 __________
 
-File: src/components/atoms/CartCounter.jsx
+File: src/components/atoms/GoogleLoginButton.jsx
 ------------------------
-// src/components/atoms/CartCounter.jsx
+// src/components/atoms/GoogleLoginButton.jsx
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+
+export default function GoogleLoginButton({ onSuccess }) {
+  return (
+    <GoogleLogin
+      onSuccess={(credentialResponse) => {
+        const decoded = jwtDecode(credentialResponse.credential);
+        onSuccess({
+          token: credentialResponse.credential,
+          email: decoded.email,
+          firstName: decoded.given_name,
+          lastName: decoded.family_name,
+        });
+      }}
+      onError={() => console.log("Login Failed")}
+      useOneTap
+    />
+  );
+}
+
+__________
+
+File: src/components/atoms/ImageShape.jsx
+------------------------
+import Image from "next/image";
+import React from "react";
+
+export default function ImageShape({
+  id,
+  alt,
+  image,
+  className,
+  leftShapeClassName,
+  rightShapeClassName,
+}) {
+  return (
+    <article
+      className={`relative  flex flex-col  justify-center w-[408px] h-[303px] md:w-[728px] md:h-[541px] p-8 ${className}`}
+      id={id}
+    >
+      <div
+        className={`${leftShapeClassName} w-[277px] md:w-[495px] h-[236px] md:h-[422px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl absolute md:-left-4 md:-top-12 -left-1 -top-2`}
+      />
+      <div
+        className={`${rightShapeClassName} w-[277px] md:w-[495px] h-[169px] md:h-[301px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl absolute md:top-0 md:bottom-0 my-auto md:-right-10 -right-2`}
+      />
+      <div className="relative  aspect-video flex flex-col w-full h-full p-4 overflow-hidden  rounded-2xl ">
+        <Image
+          src={image}
+          alt={alt}
+          width={0}
+          height={0}
+          fill
+          sizes="auto"
+          style={{ width: "100%", height: "100%" }}
+          quality="100"
+          className="absolute z-10  object-center object-cover  "
+          priority
+        />
+      </div>
+    </article>
+  );
+}
+
+__________
+
+File: src/components/atoms/LocaleSwitch.jsx
+------------------------
 "use client";
-import { useSelector } from "react-redux";
-import { useGetCartItemsQuery } from "@/features/cart/cartApi";
-import Link from "next/link";
-import { BsHandbagFill } from "react-icons/bs";
+import { useState, useEffect } from "react";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import Image from "next/image";
 
-export default function CartCounter() {
-  const { token } = useSelector((state) => state.auth);
-  const localCart = useSelector((state) => state.cart.items);
-  const { data: serverCart = [] } = useGetCartItemsQuery(undefined, {
-    skip: !token,
-  });
+export default function LocaleSwitch() {
+  const [mounted, setMounted] = useState(false);
+  const { locale, updateLocale } = useCusLocale();
 
-  const cartItems = token ? serverCart : localCart;
+  // Ensure hydration is complete before rendering
+  useEffect(() => setMounted(true), []);
+  if (!mounted) {
+    return (
+      <div className="h-8 bg-gray-200 dark:bg-gray-700 w-12 rounded-lg"></div>
+    );
+  }
+
+  // Toggle between 'ar' and 'en'
+  const targetLocale = locale === "ar" ? "en" : "ar";
+  const iconPath = `/images/${targetLocale.toUpperCase()}_ICON.svg`;
 
   return (
-    <Link href="/cart">
-      <span className="relative">
-        <BsHandbagFill size={24} />
-        <span className="absolute -top-2 -right-2 min-w-5 text-center text-sm aspect-square bg-customOrange contain-none rounded-full">
-          {cartItems.length}
-        </span>
+    <button
+      onClick={() => updateLocale(targetLocale)}
+      className="hidden md:flex items-center gap-2 p-2 rounded"
+    >
+      <Image
+        src={iconPath}
+        alt={`${targetLocale.toUpperCase()} Language`}
+        width={24}
+        height={24}
+      />
+      <span>{targetLocale.toUpperCase()}</span>
+    </button>
+  );
+}
+
+__________
+
+File: src/components/atoms/MoreInfo.jsx
+------------------------
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { HiArrowLongRight } from "react-icons/hi2";
+
+export default function MoreInfo({ link }) {
+  const t = useTranslations("molecules");
+  return (
+    <Link
+      href={link}
+      className="text-customOrange capitalize flex  items-center gap-4"
+    >
+      {t("moreInfo")}{" "}
+      <span>
+        {" "}
+        <HiArrowLongRight size={20} className="rtl:rotate-180" />
       </span>
     </Link>
   );
@@ -1517,75 +1490,635 @@ export default function Spinner({ size = "sm" }) {
 
 __________
 
-File: src/components/molecules/Navbar.jsx
+File: src/components/atoms/ThemeSwitch.jsx
 ------------------------
+// ThemeSwitch.js
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { BiSearchAlt } from "react-icons/bi";
+import { IoSunny, IoMoon } from "react-icons/io5";
+import { useThemeSwitch } from "@/hooks/useThemeSwitch";
+import Image from "next/image";
 
-import ThemeSwitch from "@/components/atoms/ThemeSwitch";
-import LocaleSwitch from "@/components/atoms/LocaleSwitch";
-import { useTranslations } from "next-intl";
-import BurgerMenu from "@/components/atoms/BurgerMenu";
-import CartCounter from "@/components/atoms/CartCounter";
+export default function ThemeSwitch() {
+  const { isMounted, resolvedTheme, toggleTheme } = useThemeSwitch();
 
-const navLinks = [
-  { url: "/", label: "home" },
-  { url: "/cart", label: "shop" },
-];
+  // Loading state while waiting for hydration
+  if (!isMounted) {
+    return (
+      <div className="h-8 bg-gray-200  dark:bg-gray-700 w-8 rounded-lg"></div>
+    );
+  }
 
-export default function Navbar() {
-  const pathname = usePathname();
-  const t = useTranslations("molecules");
+  // Render the appropriate icon based on the current theme
+  if (resolvedTheme === "dark") {
+    return (
+      <IoSunny
+        size={24}
+        className="text-customOrange hidden md:block cursor-pointer"
+        onClick={toggleTheme}
+        title="Switch to Light Mode"
+      />
+    );
+  }
+
+  if (resolvedTheme === "light") {
+    return (
+      <IoMoon
+        size={24}
+        className="hidden md:block cursor-pointer"
+        onClick={toggleTheme}
+        title="Switch to Dark Mode"
+      />
+    );
+  }
+
+  return null; // Fallback in case resolvedTheme is undefined
+}
+
+__________
+
+File: src/components/atoms/CustomGoogleLoginButton.jsx
+------------------------
+// src/components/atoms/CustomGoogleLoginButton.jsx
+"use client";
+
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useSocialLoginMutation } from "@/features/auth/authApi";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "@/features/auth/authSlice";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+const CustomGoogleLoginButton = ({
+  onSuccess,
+  isPage = true,
+  className = "",
+}) => {
+  const [socialLogin, { isLoading }] = useSocialLoginMutation();
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleGoogleSuccess = async (response) => {
+    try {
+      const { access_token } = response;
+      const res = await socialLogin(access_token).unwrap();
+      dispatch(
+        setCredentials({
+          user: {
+            name: res.data.name,
+            image: res.data.image,
+          },
+          token: res.data.token ? res.data.token : access_token,
+        }),
+      );
+      toast.success("Logged in with Google successfully!");
+
+      // Call onSuccess if provided
+      if (onSuccess) onSuccess(res);
+
+      // Only redirect to home if isPage is true
+      if (isPage) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      toast.error("Failed to log in with Google. Please try again.");
+    }
+  };
+
+  const login = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: (error) => {
+      console.error("Google login error:", error);
+      toast.error("Google login failed. Please try again.");
+    },
+    flow: "implicit",
+  });
 
   return (
-    <div
-      className={`fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
+    <button
+      onClick={() => login()}
+      disabled={isLoading}
+      className={`flex justify-center items-center ${className} ${
+        isLoading ? "opacity-50 cursor-not-allowed" : "hover:opacity-80"
+      } transition-opacity duration-200`}
+      aria-label="Sign in with Google"
     >
-      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14 ">
-        <Link href="/">
-          <span className="flex  font-agency uppercase font-bold text-2xl">
-            {t("navbar.logo")}
-          </span>
-        </Link>
-        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  w-full">
-          {navLinks.map((link) => (
-            <Link
-              key={link.url}
-              href={link.url}
-              className={`capitalize px-4  transition-colors duration-200 ${
-                pathname === link.url
-                  ? "font-extrabold "
-                  : " hover:font-extrabold"
+      <FcGoogle size={48} className="aspect-square rounded-full border-2 p-1" />
+    </button>
+  );
+};
+
+export default CustomGoogleLoginButton;
+
+__________
+
+File: src/components/checkout/AddressStep.jsx
+------------------------
+"use client";
+import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
+
+export default function AddressStep({ onSubmit }) {
+  const t = useTranslations("checkout.addressStep");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mx-auto flex flex-col justify-between items-start container w-full gap-28"
+    >
+      <div className="space-y-4 w-full">
+        <h2 className="text-2xl font-bold mb-4 uppercase">{t("title")}</h2>
+        <div>
+          <input
+            {...register("city", { required: t("errors.cityRequired") })}
+            placeholder={t("city")}
+            className="p-2 border-b-2 bg-transparent text-lg w-full"
+            required
+          />
+          {errors.city && (
+            <span className="text-red-500">{errors.city.message}</span>
+          )}
+        </div>
+        <div>
+          <input
+            placeholder={t("street")}
+            {...register("street", { required: t("errors.streetRequired") })}
+            className="p-2 border-b-2 bg-transparent text-lg w-full"
+            required
+          />
+          {errors.street && (
+            <span className="text-red-500">{errors.street.message}</span>
+          )}
+        </div>
+        <div>
+          <input
+            {...register("building", {
+              required: t("errors.buildingRequired"),
+            })}
+            className="p-2 border-b-2 bg-transparent text-lg w-full"
+            required
+            placeholder={t("building")}
+          />
+          {errors.building && (
+            <span className="text-red-500">{errors.building.message}</span>
+          )}
+        </div>
+      </div>
+      <button
+        type="submit"
+        className="bg-customOrange text-white px-4 py-4 mt-8 rounded-3xl font-extrabold w-full"
+      >
+        {t("continue")}
+      </button>
+    </form>
+  );
+}
+
+__________
+
+File: src/components/checkout/LoginStep.jsx
+------------------------
+import SignIn from "@/components/molecules/SignIn";
+import SignUp from "@/components/molecules/SignUp";
+
+export default function LoginStep({ onSuccess }) {
+  return (
+    <div className="grid md:grid-cols-2 gap-4 w-full">
+      <SignIn onSuccess={onSuccess} isPage={false} />
+      <SignUp onSuccess={onSuccess} isPage={false} />
+    </div>
+  );
+}
+
+__________
+
+File: src/components/checkout/PaymentStep.jsx
+------------------------
+import Image from "next/image";
+import { useTranslations } from "next-intl";
+
+export default function PaymentStep({ method, onMethodChange, onSubmit }) {
+  const t = useTranslations("checkout.paymentStep");
+
+  return (
+    <div className="mx-auto flex flex-col justify-between items-start container w-full gap-24">
+      <h2 className="text-2xl font-bold mb-4 uppercase">{t("title")}</h2>
+      <div className="space-y-4 w-full h-full">
+        <div className="flex items-center justify-between w-full">
+          <label className="flex items-center gap-4 text-lg capitalize">
+            <input
+              type="radio"
+              value="card"
+              checked={method === "card"}
+              onChange={(e) => onMethodChange(e.target.value)}
+              className="w-8 h-8"
+            />
+            {t("cardPayment")}
+          </label>
+          <Image
+            src="/images/VISA_MASTER.svg"
+            alt="VISA_MASTER"
+            width={100}
+            height={100}
+            className="object-cover"
+          />
+        </div>
+        <hr className="h-px my-12 bg-gray-200 border-0 dark:bg-gray-700" />
+        <div className="flex items-center justify-between w-full">
+          <label className="flex items-center gap-4 text-lg capitalize">
+            <input
+              type="radio"
+              value="paypal"
+              checked={method === "paypal"}
+              onChange={(e) => onMethodChange(e.target.value)}
+              className="w-8 h-8"
+            />
+            {t("paypal")}
+          </label>
+          <Image
+            src="/images/PAYPAL.svg"
+            alt="PAYPAL"
+            width={100}
+            height={100}
+            className="object-cover"
+          />
+        </div>
+      </div>
+      <button
+        onClick={onSubmit}
+        className="bg-customOrange text-white px-4 py-4 mt-18 rounded-3xl font-extrabold w-full"
+      >
+        {t("continue")}
+      </button>
+    </div>
+  );
+}
+
+__________
+
+File: src/components/checkout/ProgressIndicator.jsx
+------------------------
+"use client";
+import { FaRegCircle } from "react-icons/fa";
+import { FaCircleCheck } from "react-icons/fa6";
+import { useTranslations } from "next-intl";
+
+export default function ProgressIndicator({ currentStep }) {
+  const t = useTranslations("checkout.progressIndicator.steps");
+
+  const steps = [
+    { step: 1, title: t("login") },
+    { step: 2, title: t("data") },
+    { step: 3, title: t("payment") },
+    { step: 4, title: t("review") },
+  ];
+
+  return (
+    <div className="flex justify-center items-center mb-6 w-full">
+      {steps.map(({ step, title }) => (
+        <button
+          key={step}
+          className="flex items-center transition-all duration-500 ease-in-out"
+          disabled={currentStep < step}
+        >
+          <div
+            className={`max-w-[194px] md:p-1 rounded-full flex justify-between items-center gap-2 ${
+              currentStep > step ? "bg-customGreenW md:gap-8" : ""
+            }`}
+          >
+            <span>
+              {currentStep > step ? (
+                <FaCircleCheck size={32} className="text-customGreenS" />
+              ) : (
+                <FaRegCircle size={32} className="text-customBlue" />
+              )}
+            </span>
+            <span
+              className={`uppercase font-extrabold mx-1 ${
+                currentStep > step
+                  ? "text-black"
+                  : currentStep === step
+                    ? ""
+                    : "opacity-60"
               }`}
             >
-              {t(`navbar.links.${link.label}`)}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex  gap-6 items-center justify-between">
-          <Link href="/search" className="relative w-[216px] hidden md:block  ">
-            <input
-              type="text"
-              className="w-[216px] h-[40px] pl-4 pr-10 text-sm text-white bg-white/10 bg-opacity-50 backdrop-blur-sm  rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
-              // placeholder={t("heroSection.searchPlaceholder")}
-              id="search"
-            />
-            <button className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white">
-              <BiSearchAlt size={24} />
-            </button>
-          </Link>
-          <Link href="/search" className="md:hidden ">
-            <BiSearchAlt size={24} />
-          </Link>
-          <CartCounter />
-          <ThemeSwitch />
-          <LocaleSwitch className="hidden md:block" />
-          <BurgerMenu />
-        </div>
-      </header>
+              {title}
+            </span>
+          </div>
+          {step < 4 && (
+            <div
+              className={`h-px md:min-w-[173px] min-w-[40px] ${
+                currentStep >= step ? "bg-customGreenW" : "bg-customControlBg"
+              }`}
+            ></div>
+          )}
+        </button>
+      ))}
     </div>
+  );
+}
+
+__________
+
+File: src/components/checkout/ReviewStep.jsx
+------------------------
+"use client";
+import Image from "next/image";
+import { Fragment } from "react";
+import fixImageUrl from "@/utils/fixImageUrl";
+import { useTranslations } from "next-intl";
+
+export default function ReviewStep({
+  cartItems,
+  shippingAddress,
+  paymentMethod,
+  totalPriceS,
+  totalPriceVal,
+  onEditAddress,
+  onEditPayment,
+  onCreateOrder,
+  isLoading,
+}) {
+  const t = useTranslations("checkout.reviewStep");
+
+  return (
+    <div className="mx-auto flex flex-col justify-start items-start w-full gap-8">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold">{t("title")}</h2>
+        <p className="capitalize opacity-60">{t("subtitle")}</p>
+      </div>
+      <div className="flex flex-col-reverse md:flex-row gap-8 w-full">
+        <div className="w-full md:px-32">
+          <h3 className="text-xl font-semibold mb-2 uppercase">
+            {t("cartTitle", { count: cartItems.length })}
+          </h3>
+          <article className="max-h-[645px] min-h-96 overflow-scroll scroll-m-2 bg-customLightBg dark:bg-customOrangeBg rounded-3xl py-8 md:w-full">
+            {cartItems.map((item) => (
+              <Fragment key={item.id}>
+                <article className="flex justify-start items-start mb-2 px-4 py-4">
+                  <div className="max-w-[135px] min-w-[135px] bg-customLightBg dark:bg-customOrangeBg aspect-square overflow-hidden rounded-3xl">
+                    <Image
+                      src={fixImageUrl(item?.image)}
+                      alt={item.name}
+                      width={135}
+                      height={135}
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-between items-start h-[135px] w-full">
+                    <div>
+                      <h1 className="capitalize font-extrabold">{item.name}</h1>
+                      <span className="opacity-60">{t("cartDescription")}</span>
+                    </div>
+                    <div className="font-semibold text-2xl flex items-center gap-1">
+                      <span className="relative -top-0.5">$</span>
+                      {item.price}
+                    </div>
+                  </div>
+                </article>
+                <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
+              </Fragment>
+            ))}
+          </article>
+        </div>
+        <div className="mx-auto flex flex-col justify-start items-center w-full gap-8">
+          <div className="flex items-center justify-between md:w-full gap-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-2 uppercase">
+                {t("deliveryTitle")}
+              </h3>
+              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
+                <div className="flex flex-col justify-start items-start gap-1 capitalize">
+                  <span>{shippingAddress.city}</span>
+                  <span>{shippingAddress.street}</span>
+                  <span>{shippingAddress.building}</span>
+                </div>
+                <button
+                  onClick={onEditAddress}
+                  className="capitalize text-customOrange font-extrabold"
+                >
+                  {t("edit")}
+                </button>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-2 uppercase">
+                {t("paymentTitle")}
+              </h3>
+              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
+                <div className="flex justify-start items-start gap-1 capitalize">
+                  <span>{paymentMethod}</span>
+                  <span>{t("paymentSuffix")}</span>
+                </div>
+                <div>
+                  <Image
+                    src={
+                      paymentMethod === "card"
+                        ? `/images/VISA_MASTER.svg`
+                        : `/images/PAYPAL.svg`
+                    }
+                    alt={paymentMethod}
+                    width={100}
+                    height={100}
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                <button
+                  onClick={onEditPayment}
+                  className="capitalize text-customOrange font-extrabold"
+                >
+                  {t("edit")}
+                </button>
+              </div>
+            </div>
+          </div>
+          <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700 w-full hidden md:inline-block" />
+          <div className="hidden md:flex justify-between items-center w-full">
+            <span className="capitalize font-extrabold">{t("total")}</span>
+            <span className="font-extrabold text-2xl">
+              <span>{totalPriceVal}</span>
+              <span> {totalPriceS}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <button
+        onClick={onCreateOrder}
+        disabled={isLoading}
+        className="bg-customOrange text-white px-4 py-4 mt-8 rounded-3xl font-extrabold w-full"
+      >
+        {isLoading ? t("processing") : t("buyNow")}
+      </button>
+    </div>
+  );
+}
+
+__________
+
+File: src/components/checkout/SuccessStep.jsx
+------------------------
+"use client";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+
+export default function SuccessStep({ sessionUrl }) {
+  const t = useTranslations("checkout");
+  const [count, setCount] = useState(5); // Countdown starts at 5 seconds
+
+  useEffect(() => {
+    if (!sessionUrl) return; // Do nothing if sessionUrl is missing
+
+    const timer = setInterval(() => {
+      setCount((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer); // Stop the timer
+          window.location.href = sessionUrl; // Redirect to the session URL
+          return 0;
+        }
+        return prev - 1; // Decrease countdown
+      });
+    }, 1000); // Decrease every second
+
+    return () => clearInterval(timer); // Cleanup on component unmount
+  }, [sessionUrl]);
+
+  if (!sessionUrl) {
+    return (
+      <div className="max-w-md mx-auto flex flex-col justify-center items-center gap-6">
+        <p className="text-red-500 font-bold">
+          {t("successStep.errorSessionUrl")}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-md mx-auto flex flex-col justify-center items-center gap-6">
+      <div>
+        <h2 className="text-4xl font-bold mb-4">{t("successStep.title")}</h2>
+        <p className="text-center">{t("successStep.message")}</p>
+        <p className="text-center mt-2">
+          {t("successStep.redirecting", { count })} {/* Display countdown */}
+        </p>
+      </div>
+      <Image
+        src={"/images/SUCCESS.svg"}
+        alt={"success order"}
+        width={264}
+        height={395}
+        className="object-contain object-center"
+      />
+      <Link
+        href={"/"}
+        className="bg-customOrange text-white font-extrabold capitalize px-12 py-4 rounded-full mt-4"
+      >
+        {t("successStep.goToHome")}
+      </Link>
+    </div>
+  );
+}
+
+__________
+
+File: src/components/molecules/CartItems.jsx
+------------------------
+"use client";
+import Image from "next/image";
+import { getFormattedPriceComponents } from "@/utils/getFormattedPrice";
+import { IoAddCircle } from "react-icons/io5";
+import { HiMiniMinusCircle } from "react-icons/hi2";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { useCartActions } from "@/hooks/useCartActions";
+import fixImageUrl from "@/utils/fixImageUrl";
+import Spinner from "@/components/atoms/Spinner";
+
+export default function CartItems({ item }) {
+  const {
+    handleIncrease,
+    handleDecrease,
+    handleRemove,
+    isIncreasing,
+    isDecreasing,
+    isRemoving,
+  } = useCartActions();
+  const totalPrice = item.price * item.qty;
+  const [totalSy, totalVal] = getFormattedPriceComponents(totalPrice);
+
+  return (
+    <article className="w-full flex  justify-between items-center gap-4">
+      <div className="max-w-[135px] min-w-[135px] bg-customLightBg dark:bg-customOrangeBg aspect-square overflow-hidden rounded-3xl">
+        <Image
+          src={fixImageUrl(item?.image)}
+          alt={item.name}
+          width={135}
+          height={135}
+          priority
+          className="object-cover"
+        />
+      </div>
+      <div className="w-full flex md:justify-between md:items-start md:flex-row md:flex-nowrap flex-col flex-wrap justify-between items-start h-full gap-4">
+        <div className=" ">
+          <h1 className="font-extrabold capitalize">{item.name}</h1>
+          <p className="text-sm opacity-75">SKU: {item.sku || "N/A"}</p>
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={() => handleRemove(item.id)} // Use item.id consistently
+            disabled={isRemoving[item.id]}
+            className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
+          >
+            {isRemoving[item.id] ? (
+              <Spinner size="sm" />
+            ) : (
+              <FaRegTrashAlt size={20} />
+            )}
+          </button>
+          <div className="flex justify-start items-center gap-4">
+            <button
+              onClick={() => handleDecrease(item.id)}
+              disabled={item.qty <= 1 || isDecreasing[item.id]}
+              className="disabled:opacity-50 text-customOrange hover:text-orange-600 transition-colors"
+            >
+              {isDecreasing[item.id] ? (
+                <Spinner size="sm" />
+              ) : (
+                <HiMiniMinusCircle size={20} />
+              )}
+            </button>
+
+            <span className="min-w-[20px] text-center">{item.qty}</span>
+
+            <button
+              onClick={() => handleIncrease(item.id)}
+              disabled={isIncreasing[item.id]}
+              className="text-customOrange hover:text-orange-600 transition-colors disabled:opacity-50"
+            >
+              {isIncreasing[item.id] ? (
+                <Spinner size="sm" />
+              ) : (
+                <IoAddCircle size={20} />
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className=" flex justify-center items-center gap-4">
+        <span className="font-extrabold text-lg flex items-center gap-1">
+          <span className="relative -top-0.5">{totalSy}</span>
+          {totalVal}
+        </span>
+      </div>
+    </article>
   );
 }
 
@@ -1736,30 +2269,75 @@ export default function Footer() {
 
 __________
 
-File: src/components/molecules/ProductList.jsx
+File: src/components/molecules/Navbar.jsx
 ------------------------
-import { useGetProductsByCategoryQuery } from "@/features/products/productApi";
-import { useCusLocale } from "@/hooks/useCusLocale";
-import ProductCard from "@/components/molecules/ProductCard";
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { BiSearchAlt } from "react-icons/bi";
 
-import React from "react";
+import ThemeSwitch from "@/components/atoms/ThemeSwitch";
+import LocaleSwitch from "@/components/atoms/LocaleSwitch";
+import { useTranslations } from "next-intl";
+import BurgerMenu from "@/components/atoms/BurgerMenu";
+import CartCounter from "@/components/atoms/CartCounter";
 
-export default function ProductList({ categoryId }) {
-  const { locale } = useCusLocale();
-  const {
-    data: products,
-    isLoading,
-    error,
-  } = useGetProductsByCategoryQuery({ categoryId, locale });
-  if (isLoading) return <div>load...</div>;
+const navLinks = [
+  { url: "/", label: "home" },
+  { url: "/cart", label: "shop" },
+];
+
+export default function Navbar() {
+  const pathname = usePathname();
+  const t = useTranslations("molecules");
+
   return (
-    <section className="min-h-dvh relative grid grid-cols-1 md:grid-cols-4 gap-28 justify-items-center w-full mt-20 py-20 mx-auto  ">
-      {products &&
-        products.length > 0 &&
-        products.map((product, index) => (
-          <ProductCard product={product} key={product.id} />
-        ))}
-    </section>
+    <div
+      className={`fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
+    >
+      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14 ">
+        <Link href="/">
+          <span className="flex  font-agency uppercase font-bold text-2xl">
+            {t("navbar.logo")}
+          </span>
+        </Link>
+        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  w-full">
+          {navLinks.map((link) => (
+            <Link
+              key={link.url}
+              href={link.url}
+              className={`capitalize px-4  transition-colors duration-200 ${
+                pathname === link.url
+                  ? "font-extrabold "
+                  : " hover:font-extrabold"
+              }`}
+            >
+              {t(`navbar.links.${link.label}`)}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex  gap-6 items-center justify-between">
+          <Link href="/search" className="relative w-[216px] hidden md:block  ">
+            <input
+              type="text"
+              className="w-[216px] h-[40px] pl-4 pr-10 text-sm text-white bg-white/10 bg-opacity-50 backdrop-blur-sm  rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
+              // placeholder={t("heroSection.searchPlaceholder")}
+              id="search"
+            />
+            <button className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white">
+              <BiSearchAlt size={24} />
+            </button>
+          </Link>
+          <Link href="/search" className="md:hidden ">
+            <BiSearchAlt size={24} />
+          </Link>
+          <CartCounter />
+          <ThemeSwitch />
+          <LocaleSwitch className="hidden md:block" />
+          <BurgerMenu />
+        </div>
+      </header>
+    </div>
   );
 }
 
@@ -1840,6 +2418,35 @@ export default function ProductCard({ product }) {
 
 __________
 
+File: src/components/molecules/ProductList.jsx
+------------------------
+import { useGetProductsByCategoryQuery } from "@/features/products/productApi";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import ProductCard from "@/components/molecules/ProductCard";
+
+import React from "react";
+
+export default function ProductList({ categoryId }) {
+  const { locale } = useCusLocale();
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useGetProductsByCategoryQuery({ categoryId, locale });
+  if (isLoading) return <div>load...</div>;
+  return (
+    <section className="min-h-dvh relative grid grid-cols-1 md:grid-cols-4 gap-28 justify-items-center w-full mt-20 py-20 mx-auto  ">
+      {products &&
+        products.length > 0 &&
+        products.map((product, index) => (
+          <ProductCard product={product} key={product.id} />
+        ))}
+    </section>
+  );
+}
+
+__________
+
 File: src/components/molecules/SignIn.jsx
 ------------------------
 // src/components/molecules/SignIn.jsx
@@ -1865,16 +2472,16 @@ export default function SignIn({ isPage = true }) {
   const onSubmit = async (data) => {
     try {
       const res = await login(data).unwrap();
+console.log(res);
       dispatch(
         setCredentials({
-          user: res.data.user,
+          user: {
+            name: `${res.data.name} ${res.data.lastname}`,
+            image : res.data.image,
+          },
           token: res.data.token,
         }),
       );
-      // if (localCart.length > 0) {
-      //   await dispatch(syncCart(localCart));
-      //   dispatch(clearCart());
-      // }
       isPage && router.push("/");
     } catch (error) {
       console.error("SignIn failed:", error);
@@ -1947,6 +2554,8 @@ import { FcGoogle } from "react-icons/fc";
 import { IoIosAt } from "react-icons/io";
 import { CiLock } from "react-icons/ci";
 import { RiUser4Line } from "react-icons/ri";
+import CustomGoogleLoginButton from "@/components/atoms/CustomGoogleLoginButton";
+import {toast} from "sonner";
 // import GoogleLoginButton from "@/components/atoms/GoogleLoginButton";
 
 export default function SignUp({ isPage = true }) {
@@ -1964,9 +2573,15 @@ export default function SignUp({ isPage = true }) {
   const onSubmit = async (data) => {
     try {
       const res = await registerUser(data).unwrap();
+      if(res.code === 422){
+        return toast.error("it's already registered");
+      }
       dispatch(
         setCredentials({
-          user: res.data,
+          user: {
+            name : res.data.name,
+            image : res.data.image,
+          },
           token: res.data.token,
         }),
       );
@@ -1976,21 +2591,6 @@ export default function SignUp({ isPage = true }) {
     }
   };
 
-  const handleGoogleSuccess = async (googleData) => {
-    try {
-      const res = await socialLogin(googleData.token).unwrap();
-
-      dispatch(
-        setCredentials({
-          user: res.user,
-          token: res.token,
-        }),
-      );
-      router.push("/");
-    } catch (error) {
-      console.error("Google login failed:", error);
-    }
-  };
 
   return (
     <article className="bg-customLightBg dark:bg-customOrangeBg rounded-3xl min-h-[772px] w-full flex flex-col justify-start items-center gap-8 p-8">
@@ -2085,183 +2685,15 @@ export default function SignUp({ isPage = true }) {
             <div className="flex-1 border-t border-gray-300"></div>
           </div>
 
-          {/*<GoogleLoginButton onSuccess={handleGoogleSuccess} />*/}
-          <FcGoogle
-            size={48}
-            className="aspect-square rounded-full border-2 p-1"
+          <CustomGoogleLoginButton
+              isPage={isPage}
+              onSuccess={(response) => {
+                console.log("Login response:");
+              }}
           />
         </div>
       </form>
     </article>
-  );
-}
-
-__________
-
-File: src/components/molecules/CartItems.jsx
-------------------------
-"use client";
-import Image from "next/image";
-import { getFormattedPriceComponents } from "@/utils/getFormattedPrice";
-import { IoAddCircle } from "react-icons/io5";
-import { HiMiniMinusCircle } from "react-icons/hi2";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { useCartActions } from "@/hooks/useCartActions";
-import fixImageUrl from "@/utils/fixImageUrl";
-import Spinner from "@/components/atoms/Spinner";
-
-export default function CartItems({ item }) {
-  const {
-    handleIncrease,
-    handleDecrease,
-    handleRemove,
-    isIncreasing,
-    isDecreasing,
-    isRemoving,
-  } = useCartActions();
-  const totalPrice = item.price * item.qty;
-  const [totalSy, totalVal] = getFormattedPriceComponents(totalPrice);
-
-  return (
-    <article className="w-full flex  justify-between items-center gap-4">
-      <div className="max-w-[135px] min-w-[135px] bg-customLightBg dark:bg-customOrangeBg aspect-square overflow-hidden rounded-3xl">
-        <Image
-          src={fixImageUrl(item?.image)}
-          alt={item.name}
-          width={135}
-          height={135}
-          priority
-          className="object-cover"
-        />
-      </div>
-      <div className="w-full flex md:justify-between md:items-start md:flex-row md:flex-nowrap flex-col flex-wrap justify-between items-start h-full gap-4">
-        <div className=" ">
-          <h1 className="font-extrabold capitalize">{item.name}</h1>
-          <p className="text-sm opacity-75">SKU: {item.sku || "N/A"}</p>
-        </div>
-
-        <div className="flex gap-4">
-          <button
-            onClick={() => handleRemove(item.id)} // Use item.id consistently
-            disabled={isRemoving[item.id]}
-            className="text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
-          >
-            {isRemoving[item.id] ? (
-              <Spinner size="sm" />
-            ) : (
-              <FaRegTrashAlt size={20} />
-            )}
-          </button>
-          <div className="flex justify-start items-center gap-4">
-            <button
-              onClick={() => handleDecrease(item.id)}
-              disabled={item.qty <= 1 || isDecreasing[item.id]}
-              className="disabled:opacity-50 text-customOrange hover:text-orange-600 transition-colors"
-            >
-              {isDecreasing[item.id] ? (
-                <Spinner size="sm" />
-              ) : (
-                <HiMiniMinusCircle size={20} />
-              )}
-            </button>
-
-            <span className="min-w-[20px] text-center">{item.qty}</span>
-
-            <button
-              onClick={() => handleIncrease(item.id)}
-              disabled={isIncreasing[item.id]}
-              className="text-customOrange hover:text-orange-600 transition-colors disabled:opacity-50"
-            >
-              {isIncreasing[item.id] ? (
-                <Spinner size="sm" />
-              ) : (
-                <IoAddCircle size={20} />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className=" flex justify-center items-center gap-4">
-        <span className="font-extrabold text-lg flex items-center gap-1">
-          <span className="relative -top-0.5">{totalSy}</span>
-          {totalVal}
-        </span>
-      </div>
-    </article>
-  );
-}
-
-__________
-
-File: src/components/organisms/HeroSection.jsx
-------------------------
-import { BiSearchAlt } from "react-icons/bi";
-import Image from "next/image";
-import { useTranslations } from "next-intl";
-
-export default function HeroSection() {
-  const t = useTranslations("home");
-  return (
-    <section className="relative flex flex-col justify-center items-center gap-4 min-h-dvh w-full bg-[url(../../public/images/HERO_SECTION_PHONE.png)] md:bg-[url(../../public/images/HERO_SECTION.png)] hero-container bg-no-repeat  bg-cover md:bg-current bg-fixed">
-      <h1 className="text-[36px] md:w-[950px] px-6  md:text-[80px] text-center capitalize   font-extrabold  text-white  ">
-        {t("heroSection.title")}
-      </h1>
-      <p className="text-white/60 text-center font-extrabold  text-xl md:text-2xl my-6 text-wrap px-6 mb-60 md:mb-0  md:w-[650px]">
-        {t("heroSection.description")}
-      </p>
-      <div className="relative w-[300px] hidden md:block  ">
-        <input
-          type="text"
-          className="w-[300px] h-[40px] pl-4 pr-10 text-sm text-white bg-white/10 bg-opacity-50 backdrop-blur-sm  rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
-          placeholder={t("heroSection.searchPlaceholder")}
-          id="search"
-        />
-        <button className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white">
-          <BiSearchAlt size={24} />
-        </button>
-      </div>
-    </section>
-  );
-}
-
-__________
-
-File: src/components/organisms/HomeDreamSection.jsx
-------------------------
-import Image from "next/image";
-import MoreInfo from "@/components/atoms/MoreInfo";
-import BlobShape from "@/components/atoms/BlobShape";
-import { useTranslations } from "next-intl";
-import React from "react";
-import ImageShape from "@/components/atoms/ImageShape";
-
-export default function HomeDreamSection() {
-  const t = useTranslations("home");
-
-  return (
-    <section className="relative min-h-[70dvh] w-full flex flex-wrap justify-evenly items-center gap-8  ">
-      <BlobShape PathSvg="/images/blob/BLOB_1.svg" dirX="left" />
-
-      <ImageShape
-        id="dream"
-        alt="dream image"
-        image="/images/IMAGE_DREAM.png"
-      />
-      <article className="relative flex flex-col justify-center items-start gap-8">
-        <h1 className="text-5xl font-extrabold  mb-4">
-          {t("dreamSection.title")
-            .split("\n")
-            .map((line, index, arr) => (
-              <React.Fragment key={index}>
-                {line}
-                {index < arr.length - 1 && <br />}
-              </React.Fragment>
-            ))}
-        </h1>
-        <p className="w-[500px] opacity-60">{t("dreamSection.description")}</p>
-        <MoreInfo link="test" />
-      </article>
-    </section>
   );
 }
 
@@ -2345,6 +2777,148 @@ export default function CategoryDetailSection({ category }) {
         id={category.id}
         alt={category.title}
       />
+    </section>
+  );
+}
+
+__________
+
+File: src/components/organisms/CategoryDetailsPage.jsx
+------------------------
+"use client";
+import React, { memo, useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import { useGetCategoryByIdQuery } from "@/features/categories/categoryApi";
+import { useCusLocale } from "@/hooks/useCusLocale";
+import { useLanguageRefresh } from "@/hooks/useLanguageRefresh";
+import CategoryDetailSection from "@/components/organisms/CategoryDetailSection";
+import ProductList from "@/components/molecules/ProductList";
+import BlobShape from "@/components/atoms/BlobShape";
+import Spinner from "@/components/atoms/Spinner";
+
+function CategoryDetailsPage({ params, initialCategory }) {
+  const { locale } = useCusLocale();
+  const { id } = params;
+  const searchParams = useSearchParams();
+  const currentLang = searchParams.get("lang");
+  const [isMounted, setIsMounted] = useState(false);
+
+  const isLanguageRefreshing = useLanguageRefresh(currentLang, locale, id);
+
+  const {
+    data: category = initialCategory,
+    isLoading,
+    error,
+  } = useGetCategoryByIdQuery(
+    { id, locale },
+    { skip: !isMounted || !!initialCategory },
+  );
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || isLanguageRefreshing || isLoading) {
+    return (
+      <div className="min-h-[80dvh] p-8 mx-10 my-20 flex flex-col justify-center items-center">
+        <Spinner size="xl" />
+      </div>
+    );
+  }
+
+  if (error) return <p>Error fetching category details</p>;
+  if (!category) return <p>No category data found</p>;
+
+  return (
+    <section className="min-h-full p-8 my-36 flex flex-col justify-center items-center container mx-auto">
+      <CategoryDetailSection category={category} />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_5.svg"
+        dirX="right"
+        dirY="top-[70rem]"
+      />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_6.svg"
+        dirX="left"
+        dirY="top-[110rem]"
+      />
+      <ProductList categoryId={id} />
+    </section>
+  );
+}
+
+export default memo(CategoryDetailsPage);
+
+__________
+
+File: src/components/organisms/HeroSection.jsx
+------------------------
+import { BiSearchAlt } from "react-icons/bi";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
+
+export default function HeroSection() {
+  const t = useTranslations("home");
+  return (
+    <section className="relative flex flex-col justify-center items-center gap-4 min-h-dvh w-full bg-[url(../../public/images/HERO_SECTION_PHONE.png)] md:bg-[url(../../public/images/HERO_SECTION.png)] hero-container bg-no-repeat  bg-cover md:bg-current bg-fixed">
+      <h1 className="text-[36px] md:w-[950px] px-6  md:text-[80px] text-center capitalize   font-extrabold  text-white  ">
+        {t("heroSection.title")}
+      </h1>
+      <p className="text-white/60 text-center font-extrabold  text-xl md:text-2xl my-6 text-wrap px-6 mb-60 md:mb-0  md:w-[650px]">
+        {t("heroSection.description")}
+      </p>
+      <div className="relative w-[300px] hidden md:block  ">
+        <input
+          type="text"
+          className="w-[300px] h-[40px] pl-4 pr-10 text-sm text-white bg-white/10 bg-opacity-50 backdrop-blur-sm  rounded-full focus:outline-none focus:ring-1 focus:ring-gray-400 placeholder-gray-400"
+          placeholder={t("heroSection.searchPlaceholder")}
+          id="search"
+        />
+        <button className="absolute inset-y-0 ltr:right-0 rtl:left-0 flex items-center justify-center w-10 text-gray-300 hover:text-white">
+          <BiSearchAlt size={24} />
+        </button>
+      </div>
+    </section>
+  );
+}
+
+__________
+
+File: src/components/organisms/HomeDreamSection.jsx
+------------------------
+import Image from "next/image";
+import MoreInfo from "@/components/atoms/MoreInfo";
+import BlobShape from "@/components/atoms/BlobShape";
+import { useTranslations } from "next-intl";
+import React from "react";
+import ImageShape from "@/components/atoms/ImageShape";
+
+export default function HomeDreamSection() {
+  const t = useTranslations("home");
+
+  return (
+    <section className="relative min-h-[70dvh] w-full flex flex-wrap justify-evenly items-center gap-8  ">
+      <BlobShape PathSvg="/images/blob/BLOB_1.svg" dirX="left" />
+
+      <ImageShape
+        id="dream"
+        alt="dream image"
+        image="/images/IMAGE_DREAM.png"
+      />
+      <article className="relative flex flex-col justify-center items-start gap-8">
+        <h1 className="text-5xl font-extrabold  mb-4">
+          {t("dreamSection.title")
+            .split("\n")
+            .map((line, index, arr) => (
+              <React.Fragment key={index}>
+                {line}
+                {index < arr.length - 1 && <br />}
+              </React.Fragment>
+            ))}
+        </h1>
+        <p className="w-[500px] opacity-60">{t("dreamSection.description")}</p>
+        <MoreInfo link="test" />
+      </article>
     </section>
   );
 }
@@ -2686,563 +3260,371 @@ export default memo(ProductDetailsPage);
 
 __________
 
-File: src/components/organisms/CategoryDetailsPage.jsx
+File: src/features/auth/authApi.js
 ------------------------
-"use client";
-import React, { memo, useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
-import { useGetCategoryByIdQuery } from "@/features/categories/categoryApi";
-import { useCusLocale } from "@/hooks/useCusLocale";
-import { useLanguageRefresh } from "@/hooks/useLanguageRefresh";
-import CategoryDetailSection from "@/components/organisms/CategoryDetailSection";
-import ProductList from "@/components/molecules/ProductList";
-import BlobShape from "@/components/atoms/BlobShape";
-import Spinner from "@/components/atoms/Spinner";
+// src/features/auth/authApi.js
+import { api } from "@/store/api/api";
 
-function CategoryDetailsPage({ params, initialCategory }) {
-  const { locale } = useCusLocale();
-  const { id } = params;
-  const searchParams = useSearchParams();
-  const currentLang = searchParams.get("lang");
-  const [isMounted, setIsMounted] = useState(false);
+export const authApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    login: builder.mutation({
+      query: (credentials) => ({
+        url: "/login",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+    register: builder.mutation({
+      query: (userData) => ({
+        url: "/register",
+        method: "POST",
+        body: userData,
+      }),
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        url: "/out",
+        method: "GET",
+      }),
+    }),
+    socialLogin: builder.mutation({
+      query: (accessToken) => ({
+        url: "/user/social-login",
+        method: "POST",
+        body: {
+          account_type: "google",
+          token: accessToken,
+        },
+      }),
+    }),
+    invalidatesTags: ["Cart"],
+  }),
+});
 
-  const isLanguageRefreshing = useLanguageRefresh(currentLang, locale, id);
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLogoutMutation,
+  useSocialLoginMutation,
+} = authApi;
 
-  const {
-    data: category = initialCategory,
-    isLoading,
-    error,
-  } = useGetCategoryByIdQuery(
-    { id, locale },
-    { skip: !isMounted || !!initialCategory },
-  );
+__________
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+File: src/features/auth/authSlice.js
+------------------------
+// src/features/auth/authSlice.js
+import {createSlice} from "@reduxjs/toolkit";
 
-  if (!isMounted || isLanguageRefreshing || isLoading) {
-    return (
-      <div className="min-h-[80dvh] p-8 mx-10 my-20 flex flex-col justify-center items-center">
-        <Spinner size="xl" />
-      </div>
-    );
+const loadAuthState = () => {
+    if (typeof window === "undefined") return {user: null, token: null};
+    try {
+        return {
+            user: JSON.parse(localStorage.getItem("user")),
+            token: localStorage.getItem("token"),
+        };
+    } catch {
+        return {user: null, token: null};
+    }
+};
+
+const authSlice = createSlice({
+    name: "auth",
+    initialState: loadAuthState(),
+    reducers: {
+        setCredentials: (state, action) => {
+            state.user = action.payload.user;
+            state.token = action.payload.token;
+            localStorage.setItem("user", JSON.stringify(action.payload.user));
+            localStorage.setItem("token", action.payload.token);
+        },
+        clearCredentials: (state) => {
+            state.user = null;
+            state.token = null;
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+        },
+    },
+});
+
+export const {setCredentials, clearCredentials} = authSlice.actions;
+export default authSlice.reducer;
+
+__________
+
+File: src/features/cart/cartApi.js
+------------------------
+// src/features/cart/cartApi.js
+import { api } from "@/store/api/api";
+
+export const cartApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    getCartItems: builder.query({
+      query: () => "/cart/items",
+      providesTags: ["Cart"],
+      transformResponse: (response) => response?.data?.cart_items || [],
+    }),
+    addItemToCart: builder.mutation({
+      query: (data) => ({
+        url: "/cart/add-item",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+    increaseItem: builder.mutation({
+      query: (data) => ({
+        url: "/cart/increase-item",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+    decreaseItem: builder.mutation({
+      query: (data) => ({
+        url: "/cart/decrease-item",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+    removeItem: builder.mutation({
+      query: (data) => ({
+        url: "/cart/remove-item",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+    clearCart: builder.mutation({
+      query: () => ({
+        url: "/cart/destroy-cart",
+        method: "POST",
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+  }),
+  overrideExisting: true,
+});
+
+export const {
+  useGetCartItemsQuery,
+  useAddItemToCartMutation,
+  useIncreaseItemMutation,
+  useDecreaseItemMutation,
+  useRemoveItemMutation,
+  useClearCartMutation,
+} = cartApi;
+
+__________
+
+File: src/features/cart/cartSlice.js
+------------------------
+// src/features/cart/cartSlice.js
+import { createSlice } from "@reduxjs/toolkit";
+
+const loadCart = () => {
+  try {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+  } catch {
+    return [];
   }
+};
 
-  if (error) return <p>Error fetching category details</p>;
-  if (!category) return <p>No category data found</p>;
+const cartSlice = createSlice({
+  name: "cart",
+  initialState: {
+    items: loadCart(),
+    total: 0,
+  },
+  reducers: {
+    addItem: (state, action) => {
+      const existingItem = state.items.find(
+        (item) => item.id === action.payload.id,
+      );
+      if (existingItem) {
+        existingItem.qty += action.payload.qty;
+      } else {
+        state.items.push({
+          id: action.payload.id,
+          name: action.payload.name,
+          price: action.payload.price, // Include price here
+          qty: action.payload.qty,
+          image: action.payload.image,
+        });
+      }
+      localStorage.setItem("cart", JSON.stringify(state.items));
+    },
+    updateItem: (state, action) => {
+      const item = state.items.find((item) => item.id === action.payload.id);
+      if (item) {
+        item.quantity = action.payload.quantity;
+      }
+      localStorage.setItem("cart", JSON.stringify(state.items));
+    },
 
-  return (
-    <section className="min-h-full p-8 my-36 flex flex-col justify-center items-center container mx-auto">
-      <CategoryDetailSection category={category} />
-      <BlobShape
-        PathSvg="/images/blob/BLOB_5.svg"
-        dirX="right"
-        dirY="top-[70rem]"
-      />
-      <BlobShape
-        PathSvg="/images/blob/BLOB_6.svg"
-        dirX="left"
-        dirY="top-[110rem]"
-      />
-      <ProductList categoryId={id} />
-    </section>
-  );
-}
+    clearCart: (state) => {
+      state.items = [];
+      localStorage.removeItem("cart");
+    },
+    setCart: (state, action) => {
+      state.items = action.payload;
+      localStorage.setItem("cart", JSON.stringify(action.payload));
+    },
+    incrementItem: (state, action) => {
+      const item = state.items.find((i) => i.id === action.payload);
+      if (item) item.qty += 1;
+      localStorage.setItem("cart", JSON.stringify(state.items));
+    },
+    decrementItem: (state, action) => {
+      const item = state.items.find((i) => i.id === action.payload);
+      if (item && item.qty > 1) item.qty -= 1;
+      localStorage.setItem("cart", JSON.stringify(state.items));
+    },
+    removeItem: (state, action) => {
+      state.items = state.items.filter((item) => item.id !== action.payload);
+      localStorage.setItem("cart", JSON.stringify(state.items));
+    },
+  },
+});
 
-export default memo(CategoryDetailsPage);
-
-__________
-
-File: src/components/checkout/ProgressIndicator.jsx
-------------------------
-"use client";
-import { FaRegCircle } from "react-icons/fa";
-import { FaCircleCheck } from "react-icons/fa6";
-import { useTranslations } from "next-intl";
-
-export default function ProgressIndicator({ currentStep }) {
-  const t = useTranslations("checkout.progressIndicator.steps");
-
-  const steps = [
-    { step: 1, title: t("login") },
-    { step: 2, title: t("data") },
-    { step: 3, title: t("payment") },
-    { step: 4, title: t("review") },
-  ];
-
-  return (
-    <div className="flex justify-center items-center mb-6 w-full">
-      {steps.map(({ step, title }) => (
-        <button
-          key={step}
-          className="flex items-center transition-all duration-500 ease-in-out"
-          disabled={currentStep < step}
-        >
-          <div
-            className={`max-w-[194px] md:p-1 rounded-full flex justify-between items-center gap-2 ${
-              currentStep > step ? "bg-customGreenW md:gap-8" : ""
-            }`}
-          >
-            <span>
-              {currentStep > step ? (
-                <FaCircleCheck size={32} className="text-customGreenS" />
-              ) : (
-                <FaRegCircle size={32} className="text-customBlue" />
-              )}
-            </span>
-            <span
-              className={`uppercase font-extrabold mx-1 ${
-                currentStep > step
-                  ? "text-black"
-                  : currentStep === step
-                    ? ""
-                    : "opacity-60"
-              }`}
-            >
-              {title}
-            </span>
-          </div>
-          {step < 4 && (
-            <div
-              className={`h-px md:min-w-[173px] min-w-[40px] ${
-                currentStep >= step ? "bg-customGreenW" : "bg-customControlBg"
-              }`}
-            ></div>
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
+export const {
+  addItem,
+  updateItem,
+  removeItem,
+  clearCart,
+  setCart,
+  decrementItem,
+  incrementItem,
+} = cartSlice.actions;
+export default cartSlice.reducer;
 
 __________
 
-File: src/components/checkout/LoginStep.jsx
+File: src/features/categories/categoryApi.js
 ------------------------
-import SignIn from "@/components/molecules/SignIn";
-import SignUp from "@/components/molecules/SignUp";
+import {api} from "../../store/api/api";
 
-export default function LoginStep({ onSuccess }) {
-  return (
-    <div className="grid md:grid-cols-2 gap-4 w-full">
-      <SignIn onSuccess={onSuccess} isPage={false} />
-      <SignUp onSuccess={onSuccess} isPage={false} />
-    </div>
-  );
-}
+export const categoryApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getCategories: builder.query({
+            query: (locale) => "/category/get",
+            transformResponse: (response) => response.data,
+            providesTags: ["Categories"],
+        }),
+        getCategoryById: builder.query({
+            query: ({id, locale}) => `/category/find/${id}`,
+            transformResponse: (response) => response.data,
+            providesTags: ["Categories"],
+        }),
+    }),
+    overrideExisting: true,
+});
+
+export const {useGetCategoriesQuery, useGetCategoryByIdQuery} = categoryApi;
 
 __________
 
-File: src/components/checkout/AddressStep.jsx
+File: src/features/categories/categorySlice.js
 ------------------------
-"use client";
-import { useForm } from "react-hook-form";
-import { useTranslations } from "next-intl";
+// src/store/Slices/categorySlice.js
+import { createSlice } from "@reduxjs/toolkit";
 
-export default function AddressStep({ onSubmit }) {
-  const t = useTranslations("checkout.addressStep");
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+const initialState = {
+  selectedCategory: null,
+};
 
-  return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto flex flex-col justify-between items-start container w-full gap-28"
-    >
-      <div className="space-y-4 w-full">
-        <h2 className="text-2xl font-bold mb-4 uppercase">{t("title")}</h2>
-        <div>
-          <input
-            {...register("city", { required: t("errors.cityRequired") })}
-            placeholder={t("city")}
-            className="p-2 border-b-2 bg-transparent text-lg w-full"
-            required
-          />
-          {errors.city && (
-            <span className="text-red-500">{errors.city.message}</span>
-          )}
-        </div>
-        <div>
-          <input
-            placeholder={t("street")}
-            {...register("street", { required: t("errors.streetRequired") })}
-            className="p-2 border-b-2 bg-transparent text-lg w-full"
-            required
-          />
-          {errors.street && (
-            <span className="text-red-500">{errors.street.message}</span>
-          )}
-        </div>
-        <div>
-          <input
-            {...register("building", {
-              required: t("errors.buildingRequired"),
-            })}
-            className="p-2 border-b-2 bg-transparent text-lg w-full"
-            required
-            placeholder={t("building")}
-          />
-          {errors.building && (
-            <span className="text-red-500">{errors.building.message}</span>
-          )}
-        </div>
-      </div>
-      <button
-        type="submit"
-        className="bg-customOrange text-white px-4 py-4 mt-8 rounded-3xl font-extrabold w-full"
-      >
-        {t("continue")}
-      </button>
-    </form>
-  );
-}
+const categorySlice = createSlice({
+  name: "category",
+  initialState,
+  reducers: {
+    setSelectedCategory: (state, action) => {
+      state.selectedCategory = action.payload;
+    },
+  },
+});
+
+export const { setSelectedCategory } = categorySlice.actions;
+export default categorySlice.reducer;
 
 __________
 
-File: src/components/checkout/PaymentStep.jsx
+File: src/features/order/orderApi.js
 ------------------------
-import Image from "next/image";
-import { useTranslations } from "next-intl";
+// src/features/order/orderApi.js
+import { api } from "@/store/api/api";
 
-export default function PaymentStep({ method, onMethodChange, onSubmit }) {
-  const t = useTranslations("checkout.paymentStep");
+export const orderApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    getOrderPrice: builder.query({
+      query: () => "/order/order-price",
+      providesTags: ["Order"],
+    }),
+    createOrder: builder.mutation({
+      query: (data) => ({
+        url: "/order/create",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Cart", "Order"],
+    }),
+  }),
+  overrideExisting: true,
+});
 
-  return (
-    <div className="mx-auto flex flex-col justify-between items-start container w-full gap-24">
-      <h2 className="text-2xl font-bold mb-4 uppercase">{t("title")}</h2>
-      <div className="space-y-4 w-full h-full">
-        <div className="flex items-center justify-between w-full">
-          <label className="flex items-center gap-4 text-lg capitalize">
-            <input
-              type="radio"
-              value="card"
-              checked={method === "card"}
-              onChange={(e) => onMethodChange(e.target.value)}
-              className="w-8 h-8"
-            />
-            {t("cardPayment")}
-          </label>
-          <Image
-            src="/images/VISA_MASTER.svg"
-            alt="VISA_MASTER"
-            width={100}
-            height={100}
-            className="object-cover"
-          />
-        </div>
-        <hr className="h-px my-12 bg-gray-200 border-0 dark:bg-gray-700" />
-        <div className="flex items-center justify-between w-full">
-          <label className="flex items-center gap-4 text-lg capitalize">
-            <input
-              type="radio"
-              value="paypal"
-              checked={method === "paypal"}
-              onChange={(e) => onMethodChange(e.target.value)}
-              className="w-8 h-8"
-            />
-            {t("paypal")}
-          </label>
-          <Image
-            src="/images/PAYPAL.svg"
-            alt="PAYPAL"
-            width={100}
-            height={100}
-            className="object-cover"
-          />
-        </div>
-      </div>
-      <button
-        onClick={onSubmit}
-        className="bg-customOrange text-white px-4 py-4 mt-18 rounded-3xl font-extrabold w-full"
-      >
-        {t("continue")}
-      </button>
-    </div>
-  );
-}
+export const { useGetOrderPriceQuery, useCreateOrderMutation } = orderApi;
 
 __________
 
-File: src/components/checkout/ReviewStep.jsx
+File: src/features/products/productApi.js
 ------------------------
-"use client";
-import Image from "next/image";
-import { Fragment } from "react";
-import fixImageUrl from "@/utils/fixImageUrl";
-import { useTranslations } from "next-intl";
+import {api} from "../../store/api/api";
 
-export default function ReviewStep({
-  cartItems,
-  shippingAddress,
-  paymentMethod,
-  totalPriceS,
-  totalPriceVal,
-  onEditAddress,
-  onEditPayment,
-  onCreateOrder,
-  isLoading,
-}) {
-  const t = useTranslations("checkout.reviewStep");
+export const productApi = api.injectEndpoints({
+    endpoints: (builder) => ({
+        getProductsByCategory: builder.query({
+            query: ({categoryId, locale}) =>
+                `/product/category?category_id=${categoryId}`,
+            transformResponse: (response) => {
+                return response.data;
+            },
+            providesTags: ["Products"],
+        }),
+        getProductById: builder.query({
+            query: ({id, locale}) => `/product/find/${id}`,
+            transformResponse: (response) => response.data,
+            providesTags: ["Products"],
+        }),
+    }),
+    overrideExisting: true,
+});
 
-  return (
-    <div className="mx-auto flex flex-col justify-start items-start w-full gap-8">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold">{t("title")}</h2>
-        <p className="capitalize opacity-60">{t("subtitle")}</p>
-      </div>
-      <div className="flex flex-col-reverse md:flex-row gap-8 w-full">
-        <div className="w-full md:px-32">
-          <h3 className="text-xl font-semibold mb-2 uppercase">
-            {t("cartTitle", { count: cartItems.length })}
-          </h3>
-          <article className="max-h-[645px] min-h-96 overflow-scroll scroll-m-2 bg-customLightBg dark:bg-customOrangeBg rounded-3xl py-8 md:w-full">
-            {cartItems.map((item) => (
-              <Fragment key={item.id}>
-                <article className="flex justify-start items-start mb-2 px-4 py-4">
-                  <div className="max-w-[135px] min-w-[135px] bg-customLightBg dark:bg-customOrangeBg aspect-square overflow-hidden rounded-3xl">
-                    <Image
-                      src={fixImageUrl(item?.image)}
-                      alt={item.name}
-                      width={135}
-                      height={135}
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between items-start h-[135px] w-full">
-                    <div>
-                      <h1 className="capitalize font-extrabold">{item.name}</h1>
-                      <span className="opacity-60">{t("cartDescription")}</span>
-                    </div>
-                    <div className="font-semibold text-2xl flex items-center gap-1">
-                      <span className="relative -top-0.5">$</span>
-                      {item.price}
-                    </div>
-                  </div>
-                </article>
-                <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700" />
-              </Fragment>
-            ))}
-          </article>
-        </div>
-        <div className="mx-auto flex flex-col justify-start items-center w-full gap-8">
-          <div className="flex items-center justify-between md:w-full gap-8">
-            <div>
-              <h3 className="text-xl font-semibold mb-2 uppercase">
-                {t("deliveryTitle")}
-              </h3>
-              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
-                <div className="flex flex-col justify-start items-start gap-1 capitalize">
-                  <span>{shippingAddress.city}</span>
-                  <span>{shippingAddress.street}</span>
-                  <span>{shippingAddress.building}</span>
-                </div>
-                <button
-                  onClick={onEditAddress}
-                  className="capitalize text-customOrange font-extrabold"
-                >
-                  {t("edit")}
-                </button>
-              </div>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold mb-2 uppercase">
-                {t("paymentTitle")}
-              </h3>
-              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
-                <div className="flex justify-start items-start gap-1 capitalize">
-                  <span>{paymentMethod}</span>
-                  <span>{t("paymentSuffix")}</span>
-                </div>
-                <div>
-                  <Image
-                    src={
-                      paymentMethod === "card"
-                        ? `/images/VISA_MASTER.svg`
-                        : `/images/PAYPAL.svg`
-                    }
-                    alt={paymentMethod}
-                    width={100}
-                    height={100}
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-                <button
-                  onClick={onEditPayment}
-                  className="capitalize text-customOrange font-extrabold"
-                >
-                  {t("edit")}
-                </button>
-              </div>
-            </div>
-          </div>
-          <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700 w-full hidden md:inline-block" />
-          <div className="hidden md:flex justify-between items-center w-full">
-            <span className="capitalize font-extrabold">{t("total")}</span>
-            <span className="font-extrabold text-2xl">
-              <span>{totalPriceVal}</span>
-              <span> {totalPriceS}</span>
-            </span>
-          </div>
-        </div>
-      </div>
-      <button
-        onClick={onCreateOrder}
-        disabled={isLoading}
-        className="bg-customOrange text-white px-4 py-4 mt-8 rounded-3xl font-extrabold w-full"
-      >
-        {isLoading ? t("processing") : t("buyNow")}
-      </button>
-    </div>
-  );
-}
+export const {useGetProductsByCategoryQuery, useGetProductByIdQuery} =
+    productApi;
 
 __________
 
-File: src/components/checkout/SuccessStep.jsx
+File: src/features/products/productSlice.js
 ------------------------
-import Image from "next/image";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
+// src/store/Slices/productSlice.js
+import { createSlice } from "@reduxjs/toolkit";
 
-export default function SuccessStep() {
-  const t = useTranslations("checkout.successStep");
+const initialState = {
+  selectedProduct: null,
+};
 
-  return (
-    <div className="max-w-md mx-auto flex flex-col justify-center items-center gap-6">
-      <div>
-        <h2 className="text-4xl font-bold mb-4">{t("title")}</h2>
-        <p className="text-center">{t("message")}</p>
-      </div>
-      <Image
-        src={"/images/SUCCESS.svg"}
-        alt={"success order"}
-        width={264}
-        height={395}
-        className="object-contain object-center"
-      />
-      <Link
-        href={"/"}
-        className="bg-customOrange text-white font-extrabold capitalize px-12 py-4 rounded-full mt-4"
-      >
-        {t("goToHome")}
-      </Link>
-    </div>
-  );
-}
+const productSlice = createSlice({
+  name: "product",
+  initialState,
+  reducers: {
+    setSelectedProduct: (state, action) => {
+      state.selectedProduct = action.payload;
+    },
+  },
+});
 
-__________
-
-File: src/hooks/useThemeSwitch.js
-------------------------
-import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
-
-export function useThemeSwitch() {
-    const { setTheme, resolvedTheme } = useTheme();
-    const [isMounted, setIsMounted] = useState(false);
-
-    // Ensure hydration is complete before accessing the theme
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
-    // Function to toggle the theme
-    const toggleTheme = () => {
-        if (resolvedTheme === 'dark') {
-            setTheme('light');
-        } else {
-            setTheme('dark');
-        }
-    };
-
-    return { isMounted, resolvedTheme, toggleTheme };
-}
-__________
-
-File: src/hooks/useCusLocale.js
-------------------------
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
-import { setLocale } from "@/store/Slices/localeSlice";
-import { getLangDir } from "rtl-detect";
-
-export function useCusLocale() {
-  const dispatch = useDispatch();
-  const locale = useSelector((state) => state.locale.locale);
-  const router = useRouter();
-  const direction = getLangDir(locale);
-
-  // Update locale in Redux and cookie, then refresh the page
-  const updateLocale = (newLocale) => {
-    dispatch(setLocale(newLocale));
-    document.cookie = `NEXTAPP_LOCALE=${newLocale}; path=/;`;
-    router.refresh();
-  };
-
-  // On mount, initialize locale from cookie or browser settings
-  useEffect(() => {
-    const cookieLocale = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("NEXTAPP_LOCALE="))
-      ?.split("=")[1];
-    if (cookieLocale) {
-      dispatch(setLocale(cookieLocale));
-    } else {
-      const browserLocale = navigator.language.slice(0, 2);
-      document.cookie = `NEXTAPP_LOCALE=${browserLocale}; path=/;`;
-      dispatch(setLocale(browserLocale));
-    }
-  }, [dispatch]);
-
-  return { locale, direction, updateLocale };
-}
-
-__________
-
-File: src/hooks/useLanguageRefresh.js
-------------------------
-// src/hooks/useLanguageRefresh.js
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-
-/**
- * Hook to refresh the route when the current language differs from the desired locale.
- *
- * @param {string} currentLang - The current language from search params.
- * @param {string} locale - The desired locale.
- * @param {string|number} id - The dynamic id for the route.
- * @param {(id: string|number, locale: string) => string} [linkTemplate] - Optional function to generate a custom URL.
- * @returns {boolean} True if the route refresh is in progress, false otherwise.
- */
-export function useLanguageRefresh(currentLang, locale, id, linkTemplate) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-
-  const dynamicLink = linkTemplate
-    ? linkTemplate(id, locale)
-    : `/category/${id}?lang=${locale}`;
-
-  const refreshRoute = useCallback(() => {
-    router.replace(dynamicLink);
-    router.refresh();
-  }, [router, dynamicLink]);
-
-  useEffect(() => {
-    if (currentLang !== locale) {
-      refreshRoute();
-    } else {
-      setLoading(false);
-    }
-  }, [currentLang, locale, refreshRoute]);
-
-  return loading;
-}
+export const { setSelectedProduct } = productSlice.actions;
+export default productSlice.reducer;
 
 __________
 
@@ -3347,66 +3729,220 @@ export function useCartActions() {
 
 __________
 
-File: src/utils/fixImageUrl.js
+File: src/hooks/useCusLocale.js
 ------------------------
-const fixImageUrl = (image) => {
-  if (!image) return "/images/CHAIR.png"; // Fallback for undefined or falsy values
-  if (image.startsWith("storage"))
-    return `http://test-ecomerce.xn--hrt-w-ova.de/${image}`;
-  if (image.startsWith("http")) return image;
-  return `/images/${image}`;
-};
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { setLocale } from "@/store/Slices/localeSlice";
+import { getLangDir } from "rtl-detect";
 
-export default fixImageUrl;
+export function useCusLocale() {
+  const dispatch = useDispatch();
+  const locale = useSelector((state) => state.locale.locale);
+  const router = useRouter();
+  const direction = getLangDir(locale);
+
+  // Update locale in Redux and cookie, then refresh the page
+  const updateLocale = (newLocale) => {
+    dispatch(setLocale(newLocale));
+    document.cookie = `NEXTAPP_LOCALE=${newLocale}; path=/;`;
+    router.refresh();
+  };
+
+  // On mount, initialize locale from cookie or browser settings
+  useEffect(() => {
+    const cookieLocale = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("NEXTAPP_LOCALE="))
+      ?.split("=")[1];
+    if (cookieLocale) {
+      dispatch(setLocale(cookieLocale));
+    } else {
+      const browserLocale = navigator.language.slice(0, 2);
+      document.cookie = `NEXTAPP_LOCALE=${browserLocale}; path=/;`;
+      dispatch(setLocale(browserLocale));
+    }
+  }, [dispatch]);
+
+  return { locale, direction, updateLocale };
+}
 
 __________
 
-File: src/utils/productTitle.js
+File: src/hooks/useLanguageRefresh.js
 ------------------------
-export default function ProductTitle(title, locale) {
-  // Ensure the title is split into an array of words.
-  const titleParts = title ? title.split(" ") : [];
+// src/hooks/useLanguageRefresh.js
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
-  let separatePart = "";
-  let joinedPart = "";
+/**
+ * Hook to refresh the route when the current language differs from the desired locale.
+ *
+ * @param {string} currentLang - The current language from search params.
+ * @param {string} locale - The desired locale.
+ * @param {string|number} id - The dynamic id for the route.
+ * @param {(id: string|number, locale: string) => string} [linkTemplate] - Optional function to generate a custom URL.
+ * @returns {boolean} True if the route refresh is in progress, false otherwise.
+ */
+export function useLanguageRefresh(currentLang, locale, id, linkTemplate) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  if (locale === "en") {
-    // For English:
-    // - separatePart: last word (e.g. "Chair")
-    // - joinedPart: remaining words joined by space (e.g. "Baltsar Ikea")
-    separatePart = titleParts[titleParts.length - 1] || "";
-    joinedPart = titleParts.slice(0, titleParts.length - 1).join(" ");
-  } else if (locale === "ar") {
-    // For Arabic:
-    // - separatePart: first word (e.g. "Baltsar")
-    // - joinedPart: remaining words joined by space (e.g. "Ikea Chair")
-    separatePart = titleParts[0] || "";
-    joinedPart = titleParts.slice(1).join(" ");
-  } else {
-    // If locale is not recognized, return the full title as joinedPart.
-    joinedPart = title;
+  const dynamicLink = linkTemplate
+    ? linkTemplate(id, locale)
+    : `/category/${id}?lang=${locale}`;
+
+  const refreshRoute = useCallback(() => {
+    router.replace(dynamicLink);
+    router.refresh();
+  }, [router, dynamicLink]);
+
+  useEffect(() => {
+    if (currentLang !== locale) {
+      refreshRoute();
+    } else {
+      setLoading(false);
+    }
+  }, [currentLang, locale, refreshRoute]);
+
+  return loading;
+}
+
+__________
+
+File: src/hooks/useThemeSwitch.js
+------------------------
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+
+export function useThemeSwitch() {
+    const { setTheme, resolvedTheme } = useTheme();
+    const [isMounted, setIsMounted] = useState(false);
+
+    // Ensure hydration is complete before accessing the theme
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // Function to toggle the theme
+    const toggleTheme = () => {
+        if (resolvedTheme === 'dark') {
+            setTheme('light');
+        } else {
+            setTheme('dark');
+        }
+    };
+
+    return { isMounted, resolvedTheme, toggleTheme };
+}
+__________
+
+File: src/i18n/locales/ar/cart.json
+------------------------
+{
+  "title": "عربة التسوق الخاصة بك",
+  "subtitle": "راجع عناصرك",
+  "itemsCount": "عناصر ({count})",
+  "total": "الإجمالي",
+  "currency": "$",
+  "placeOrder": "تقديم الطلب",
+  "errorFetchingCart": "خطأ في جلب عناصر العربة"
+}
+__________
+
+File: src/i18n/locales/ar/categories.json
+------------------------
+{
+  "categoriesRoute": "التصنيفات",
+  "allCategory": "كل"
+}
+
+__________
+
+File: src/i18n/locales/ar/checkout.json
+------------------------
+{
+  "progressIndicator": {
+    "steps": {
+      "login": "تسجيل الدخول",
+      "data": "البيانات",
+      "payment": "الدفع",
+      "review": "المراجعة"
+    }
+  },
+  "addressStep": {
+    "title": "عنوان الشحن",
+    "city": "المدينة",
+    "street": "اسم الشارع",
+    "building": "رقم المبنى",
+    "continue": "متابعة",
+    "errors": {
+      "cityRequired": "المدينة مطلوبة",
+      "streetRequired": "الشارع مطلوب",
+      "buildingRequired": "رقم المبنى مطلوب"
+    }
+  },
+  "paymentStep": {
+    "title": "طريقة الدفع",
+    "cardPayment": "الدفع بالبطاقة",
+    "paypal": "باي بال",
+    "continue": "متابعة"
+  },
+  "reviewStep": {
+    "title": "مراجعة الطلب",
+    "subtitle": "عزيزي العميل، يرجى التحقق من دقة معلوماتك.",
+    "cartTitle": "عربة التسوق الخاصة بك ({count})",
+    "cartDescription": "حول الكرسي",
+    "deliveryTitle": "عنوان التوصيل",
+    "paymentTitle": "طريقة الدفع",
+    "paymentSuffix": "دفع",
+    "total": "الإجمالي",
+    "edit": "تعديل",
+    "buyNow": "اشترِ الآن",
+    "processing": "جارٍ المعالجة..."
+  },
+  "successStep": {
+    "title": "شكرًا على طلبك!",
+    "message": "تم تقديم طلبك بنجاح.",
+    "goToHome": "الذهاب إلى الصفحة الرئيسية",
+    "redirecting": "سيتم إعادة توجيهك إلى صفحة الدفع في {count} ثوانٍ...",
+    "errorSessionUrl": "خطأ: لم يتم العثور على رابط الجلسة."
+  },
+  "checkoutController": {
+    "title": "بيانات العميل الخاصة بطلبك",
+    "subtitle": "جلب أسلوبك إلى المنزل"
   }
-
-  return { separatePart, joinedPart };
 }
-
 __________
 
-File: src/utils/getFormattedPrice.js
+File: src/i18n/locales/ar/footer.json
 ------------------------
-export function getFormattedPriceComponents(price) {
-  const formattedPrice = new Intl.NumberFormat("en-IE", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 2,
-  }).format(price);
-
-  const currencySymbol = formattedPrice.charAt(0);
-  const numberValue = formattedPrice.slice(1);
-
-  return [currencySymbol, numberValue];
+{
+  "logo": "شعار",
+  "description": "ميزة استئجار مساحة عمل معنا هي أنها توفر لك خدمة مريحة ومرافق شاملة.",
+  "services": {
+    "title": "الخدمات",
+    "emailMarketing": "التسويق عبر البريد الإلكتروني",
+    "campaigns": "الحملات",
+    "branding": "العلامة التجارية"
+  },
+  "furniture": {
+    "title": "الأثاث",
+    "beds": "الأسرّة",
+    "chair": "كرسي",
+    "all": "الكل"
+  },
+  "followUs": {
+    "title": "تابعنا",
+    "facebook": "فيسبوك",
+    "twitter": "تويتر",
+    "instagram": "إنستغرام"
+  },
+  "copyright": "حقوق الطبع والنشر © 2021",
+  "termsConditions": "الشروط والأحكام",
+  "privacyPolicy": "سياسة الخصوصية"
 }
-
 __________
 
 File: src/i18n/locales/ar/home.json
@@ -3469,116 +4005,118 @@ File: src/i18n/locales/ar/molecules.json
 }
 __________
 
-File: src/i18n/locales/ar/categories.json
-------------------------
-{
-  "categoriesRoute": "التصنيفات",
-  "allCategory": "كل"
-}
-
-__________
-
-File: src/i18n/locales/ar/footer.json
-------------------------
-{
-  "logo": "شعار",
-  "description": "ميزة استئجار مساحة عمل معنا هي أنها توفر لك خدمة مريحة ومرافق شاملة.",
-  "services": {
-    "title": "الخدمات",
-    "emailMarketing": "التسويق عبر البريد الإلكتروني",
-    "campaigns": "الحملات",
-    "branding": "العلامة التجارية"
-  },
-  "furniture": {
-    "title": "الأثاث",
-    "beds": "الأسرّة",
-    "chair": "كرسي",
-    "all": "الكل"
-  },
-  "followUs": {
-    "title": "تابعنا",
-    "facebook": "فيسبوك",
-    "twitter": "تويتر",
-    "instagram": "إنستغرام"
-  },
-  "copyright": "حقوق الطبع والنشر © 2021",
-  "termsConditions": "الشروط والأحكام",
-  "privacyPolicy": "سياسة الخصوصية"
-}
-__________
-
-File: src/i18n/locales/ar/cart.json
-------------------------
-{
-  "title": "عربة التسوق الخاصة بك",
-  "subtitle": "راجع عناصرك",
-  "itemsCount": "عناصر ({count})",
-  "total": "الإجمالي",
-  "currency": "$",
-  "placeOrder": "تقديم الطلب"
-}
-__________
-
-File: src/i18n/locales/ar/checkout.json
-------------------------
-{
-  "progressIndicator": {
-    "steps": {
-      "login": "تسجيل الدخول",
-      "data": "البيانات",
-      "payment": "الدفع",
-      "review": "المراجعة"
-    }
-  },
-  "addressStep": {
-    "title": "عنوان الشحن",
-    "city": "المدينة",
-    "street": "اسم الشارع",
-    "building": "رقم المبنى",
-    "continue": "متابعة",
-    "errors": {
-      "cityRequired": "المدينة مطلوبة",
-      "streetRequired": "الشارع مطلوب",
-      "buildingRequired": "رقم المبنى مطلوب"
-    }
-  },
-  "paymentStep": {
-    "title": "طريقة الدفع",
-    "cardPayment": "الدفع بالبطاقة",
-    "paypal": "باي بال",
-    "continue": "متابعة"
-  },
-  "reviewStep": {
-    "title": "مراجعة الطلب",
-    "subtitle": "عزيزي العميل، يرجى التحقق من دقة معلوماتك.",
-    "cartTitle": "عربة التسوق الخاصة بك ({count})",
-    "cartDescription": "حول الكرسي",
-    "deliveryTitle": "عنوان التوصيل",
-    "paymentTitle": "طريقة الدفع",
-    "paymentSuffix": "دفع",
-    "total": "الإجمالي",
-    "edit": "تعديل",
-    "buyNow": "اشترِ الآن",
-    "processing": "جارٍ المعالجة..."
-  },
-  "successStep": {
-    "title": "شكرًا على طلبك!",
-    "message": "تم تقديم طلبك بنجاح.",
-    "goToHome": "الذهاب إلى الصفحة الرئيسية"
-  },
-  "checkoutController": {
-    "title": "بيانات العميل الخاصة بطلبك",
-    "subtitle": "جلب أسلوبك إلى المنزل"
-  }
-}
-__________
-
 File: src/i18n/locales/ar/search.json
 ------------------------
 {
   "title": "متجر أثاث شيك عبر الإنترنت",
   "subtitle": "اكتشف الراحة الأنيقة لكل غرفة",
   "searchPlaceholder": "بحث"
+}
+__________
+
+File: src/i18n/locales/en/cart.json
+------------------------
+{
+  "title": "Your Cart",
+  "subtitle": "Review Your Items",
+  "itemsCount": "items ({count})",
+  "total": "Total",
+  "currency": "$",
+  "placeOrder": "Place Order",
+  "errorFetchingCart": "Error fetching cart items"
+}
+__________
+
+File: src/i18n/locales/en/categories.json
+------------------------
+{
+  "categoriesRoute": "categories",
+  "allCategory": "all"
+}
+__________
+
+File: src/i18n/locales/en/checkout.json
+------------------------
+{
+  "progressIndicator": {
+    "steps": {
+      "login": "Login",
+      "data": "Data",
+      "payment": "Payment",
+      "review": "Review"
+    }
+  },
+  "addressStep": {
+    "title": "Shipping Address",
+    "city": "City",
+    "street": "Street Name",
+    "building": "Building Number",
+    "continue": "Continue",
+    "errors": {
+      "cityRequired": "City is required",
+      "streetRequired": "Street is required",
+      "buildingRequired": "Building number is required"
+    }
+  },
+  "paymentStep": {
+    "title": "Payment Method",
+    "cardPayment": "Card Payment",
+    "paypal": "PayPal",
+    "continue": "Continue"
+  },
+  "reviewStep": {
+    "title": "Review Order",
+    "subtitle": "Dear customer, please check your information for accuracy.",
+    "cartTitle": "Your shopping cart ({count})",
+    "cartDescription": "About the chair",
+    "deliveryTitle": "Delivery Address",
+    "paymentTitle": "Payment Method",
+    "paymentSuffix": "Payment",
+    "total": "Total",
+    "edit": "Edit",
+    "buyNow": "Buy Now",
+    "processing": "Processing..."
+  },
+  "successStep": {
+    "title": "Thank you for your order!",
+    "message": "Your order has been placed successfully.",
+    "goToHome": "Go to home",
+    "redirecting": "You will be redirected to the payment page in {count} seconds...",
+    "errorSessionUrl": "Error: Session URL not found."
+  },
+  "checkoutController": {
+    "title": "Your customer data for the order",
+    "subtitle": "Bringing Your Style Home"
+  }
+}
+__________
+
+File: src/i18n/locales/en/footer.json
+------------------------
+{
+  "logo": "LOGO",
+  "description": "The advantage of hiring a workspace with us is that gives you comfortable service and all-around facilities.",
+  "services": {
+    "title": "Services",
+    "emailMarketing": "Email Marketing",
+    "campaigns": "Campaigns",
+    "branding": "Branding"
+  },
+  "furniture": {
+    "title": "Furniture",
+    "beds": "Beds",
+    "chair": "Chair",
+    "all": "All"
+  },
+  "followUs": {
+    "title": "Follow Us",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "instagram": "Instagram"
+  },
+  "copyright": "Copyright © 2021",
+  "termsConditions": "Terms & Conditions",
+  "privacyPolicy": "Privacy Policy"
 }
 __________
 
@@ -3642,109 +4180,6 @@ File: src/i18n/locales/en/molecules.json
 
 __________
 
-File: src/i18n/locales/en/categories.json
-------------------------
-{
-  "categoriesRoute": "categories",
-  "allCategory": "all"
-}
-__________
-
-File: src/i18n/locales/en/footer.json
-------------------------
-{
-  "logo": "LOGO",
-  "description": "The advantage of hiring a workspace with us is that gives you comfortable service and all-around facilities.",
-  "services": {
-    "title": "Services",
-    "emailMarketing": "Email Marketing",
-    "campaigns": "Campaigns",
-    "branding": "Branding"
-  },
-  "furniture": {
-    "title": "Furniture",
-    "beds": "Beds",
-    "chair": "Chair",
-    "all": "All"
-  },
-  "followUs": {
-    "title": "Follow Us",
-    "facebook": "Facebook",
-    "twitter": "Twitter",
-    "instagram": "Instagram"
-  },
-  "copyright": "Copyright © 2021",
-  "termsConditions": "Terms & Conditions",
-  "privacyPolicy": "Privacy Policy"
-}
-__________
-
-File: src/i18n/locales/en/cart.json
-------------------------
-{
-  "title": "Your Cart",
-  "subtitle": "Review Your Items",
-  "itemsCount": "items ({count})",
-  "total": "Total",
-  "currency": "$",
-  "placeOrder": "Place Order"
-}
-__________
-
-File: src/i18n/locales/en/checkout.json
-------------------------
-{
-  "progressIndicator": {
-    "steps": {
-      "login": "Login",
-      "data": "Data",
-      "payment": "Payment",
-      "review": "Review"
-    }
-  },
-  "addressStep": {
-    "title": "Shipping Address",
-    "city": "City",
-    "street": "Street Name",
-    "building": "Building Number",
-    "continue": "Continue",
-    "errors": {
-      "cityRequired": "City is required",
-      "streetRequired": "Street is required",
-      "buildingRequired": "Building number is required"
-    }
-  },
-  "paymentStep": {
-    "title": "Payment Method",
-    "cardPayment": "Card Payment",
-    "paypal": "PayPal",
-    "continue": "Continue"
-  },
-  "reviewStep": {
-    "title": "Review Order",
-    "subtitle": "Dear customer, please check your information for accuracy.",
-    "cartTitle": "Your shopping cart ({count})",
-    "cartDescription": "About the chair",
-    "deliveryTitle": "Delivery Address",
-    "paymentTitle": "Payment Method",
-    "paymentSuffix": "Payment",
-    "total": "Total",
-    "edit": "Edit",
-    "buyNow": "Buy Now",
-    "processing": "Processing..."
-  },
-  "successStep": {
-    "title": "Thank you for your order!",
-    "message": "Your order has been placed successfully.",
-    "goToHome": "Go to home"
-  },
-  "checkoutController": {
-    "title": "Your customer data for the order",
-    "subtitle": "Bringing Your Style Home"
-  }
-}
-__________
-
 File: src/i18n/locales/en/search.json
 ------------------------
 {
@@ -3794,38 +4229,6 @@ export default getRequestConfig(async () => {
     },
   };
 });
-
-__________
-
-File: src/store/index.js
-------------------------
-import {configureStore} from "@reduxjs/toolkit";
-import {api} from "./api/api";
-import localeReducer from "./Slices/localeSlice";
-import categoryReducer from "../features/categories/categorySlice";
-import productReducer from "../features/products/productSlice";
-import authReducer from "@/features/auth/authSlice";
-import cartReducer from "../features/cart/cartSlice";
-
-export const makeStore = () => {
-    return configureStore({
-        reducer: {
-            [api.reducerPath]: api.reducer,
-            locale: localeReducer,
-            category: categoryReducer,
-            product: productReducer,
-            auth: authReducer,
-            cart: cartReducer,
-        },
-        middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware().concat(api.middleware),
-
-    });
-
-
-};
-
-export default makeStore();
 
 __________
 
@@ -3881,369 +4284,97 @@ export const api = createApi({
 
 __________
 
-File: src/features/auth/authApi.js
+File: src/store/index.js
 ------------------------
-// src/features/auth/authApi.js
-import {api} from "@/store/api/api";
+import {configureStore} from "@reduxjs/toolkit";
+import {api} from "./api/api";
+import localeReducer from "./Slices/localeSlice";
+import categoryReducer from "../features/categories/categorySlice";
+import productReducer from "../features/products/productSlice";
+import authReducer from "@/features/auth/authSlice";
+import cartReducer from "../features/cart/cartSlice";
 
-export const authApi = api.injectEndpoints({
-    endpoints: (builder) => ({
-        login: builder.mutation({
-            query: (credentials) => ({
-                url: "/login",
-                method: "POST",
-                body: credentials,
-            }),
-        }),
-        register: builder.mutation({
-            query: (userData) => ({
-                url: "/register",
-                method: "POST",
-                body: userData,
-            }),
-        }),
-        logout: builder.mutation({
-            query: () => ({
-                url: "/out",
-                method: "GET",
-            }),
-        }),
-        socialLogin: builder.mutation({
-            query: (accessToken) => ({
-                url: "/sociallogin",
-                method: "POST",
-                body: {
-                    account_type: "google",
-                    token: accessToken,
-                },
-            }),
-        }),
-    }),
-});
-
-export const {
-    useLoginMutation,
-    useRegisterMutation,
-    useLogoutMutation,
-    useSocialLoginMutation,
-} = authApi;
-
-__________
-
-File: src/features/auth/authSlice.js
-------------------------
-// src/features/auth/authSlice.js
-import {createSlice} from "@reduxjs/toolkit";
-
-const loadAuthState = () => {
-    if (typeof window === "undefined") return {user: null, token: null};
-    try {
-        return {
-            user: JSON.parse(localStorage.getItem("user")),
-            token: localStorage.getItem("token"),
-        };
-    } catch {
-        return {user: null, token: null};
-    }
-};
-
-const authSlice = createSlice({
-    name: "auth",
-    initialState: loadAuthState(),
-    reducers: {
-        setCredentials: (state, action) => {
-            state.user = action.payload.user;
-            state.token = action.payload.token;
-            localStorage.setItem("user", JSON.stringify(action.payload.user));
-            localStorage.setItem("token", action.payload.token);
+export const makeStore = () => {
+    return configureStore({
+        reducer: {
+            [api.reducerPath]: api.reducer,
+            locale: localeReducer,
+            category: categoryReducer,
+            product: productReducer,
+            auth: authReducer,
+            cart: cartReducer,
         },
-        clearCredentials: (state) => {
-            state.user = null;
-            state.token = null;
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
-        },
-    },
-});
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware().concat(api.middleware),
 
-export const {setCredentials, clearCredentials} = authSlice.actions;
-export default authSlice.reducer;
+    });
 
-__________
 
-File: src/features/categories/categorySlice.js
-------------------------
-// src/store/Slices/categorySlice.js
-import { createSlice } from "@reduxjs/toolkit";
-
-const initialState = {
-  selectedCategory: null,
 };
 
-const categorySlice = createSlice({
-  name: "category",
-  initialState,
-  reducers: {
-    setSelectedCategory: (state, action) => {
-      state.selectedCategory = action.payload;
-    },
-  },
-});
-
-export const { setSelectedCategory } = categorySlice.actions;
-export default categorySlice.reducer;
+export default makeStore();
 
 __________
 
-File: src/features/categories/categoryApi.js
+File: src/utils/fixImageUrl.js
 ------------------------
-import {api} from "../../store/api/api";
-
-export const categoryApi = api.injectEndpoints({
-    endpoints: (builder) => ({
-        getCategories: builder.query({
-            query: (locale) => "/category/get",
-            transformResponse: (response) => response.data,
-            providesTags: ["Categories"],
-        }),
-        getCategoryById: builder.query({
-            query: ({id, locale}) => `/category/find/${id}`,
-            transformResponse: (response) => response.data,
-            providesTags: ["Categories"],
-        }),
-    }),
-    overrideExisting: true,
-});
-
-export const {useGetCategoriesQuery, useGetCategoryByIdQuery} = categoryApi;
-
-__________
-
-File: src/features/products/productApi.js
-------------------------
-import {api} from "../../store/api/api";
-
-export const productApi = api.injectEndpoints({
-    endpoints: (builder) => ({
-        getProductsByCategory: builder.query({
-            query: ({categoryId, locale}) =>
-                `/product/category?category_id=${categoryId}`,
-            transformResponse: (response) => {
-                return response.data;
-            },
-            providesTags: ["Products"],
-        }),
-        getProductById: builder.query({
-            query: ({id, locale}) => `/product/find/${id}`,
-            transformResponse: (response) => response.data,
-            providesTags: ["Products"],
-        }),
-    }),
-    overrideExisting: true,
-});
-
-export const {useGetProductsByCategoryQuery, useGetProductByIdQuery} =
-    productApi;
-
-__________
-
-File: src/features/products/productSlice.js
-------------------------
-// src/store/Slices/productSlice.js
-import { createSlice } from "@reduxjs/toolkit";
-
-const initialState = {
-  selectedProduct: null,
+const fixImageUrl = (image) => {
+  if (!image) return "/images/CHAIR.png"; // Fallback for undefined or falsy values
+  if (image.startsWith("storage"))
+    return `http://test-ecomerce.xn--hrt-w-ova.de/${image}`;
+  if (image.startsWith("http")) return image;
+  return `/images/${image}`;
 };
 
-const productSlice = createSlice({
-  name: "product",
-  initialState,
-  reducers: {
-    setSelectedProduct: (state, action) => {
-      state.selectedProduct = action.payload;
-    },
-  },
-});
-
-export const { setSelectedProduct } = productSlice.actions;
-export default productSlice.reducer;
+export default fixImageUrl;
 
 __________
 
-File: src/features/cart/cartSlice.js
+File: src/utils/getFormattedPrice.js
 ------------------------
-// src/features/cart/cartSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+export function getFormattedPriceComponents(price) {
+  const formattedPrice = new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 2,
+  }).format(price);
 
-const loadCart = () => {
-  try {
-    return JSON.parse(localStorage.getItem("cart")) || [];
-  } catch {
-    return [];
+  const currencySymbol = formattedPrice.charAt(0);
+  const numberValue = formattedPrice.slice(1);
+
+  return [currencySymbol, numberValue];
+}
+
+__________
+
+File: src/utils/productTitle.js
+------------------------
+export default function ProductTitle(title, locale) {
+  // Ensure the title is split into an array of words.
+  const titleParts = title ? title.split(" ") : [];
+
+  let separatePart = "";
+  let joinedPart = "";
+
+  if (locale === "en") {
+    // For English:
+    // - separatePart: last word (e.g. "Chair")
+    // - joinedPart: remaining words joined by space (e.g. "Baltsar Ikea")
+    separatePart = titleParts[titleParts.length - 1] || "";
+    joinedPart = titleParts.slice(0, titleParts.length - 1).join(" ");
+  } else if (locale === "ar") {
+    // For Arabic:
+    // - separatePart: first word (e.g. "Baltsar")
+    // - joinedPart: remaining words joined by space (e.g. "Ikea Chair")
+    separatePart = titleParts[0] || "";
+    joinedPart = titleParts.slice(1).join(" ");
+  } else {
+    // If locale is not recognized, return the full title as joinedPart.
+    joinedPart = title;
   }
-};
 
-const cartSlice = createSlice({
-  name: "cart",
-  initialState: {
-    items: loadCart(),
-    total: 0,
-  },
-  reducers: {
-    addItem: (state, action) => {
-      const existingItem = state.items.find(
-        (item) => item.id === action.payload.id,
-      );
-      if (existingItem) {
-        existingItem.qty += action.payload.qty;
-      } else {
-        state.items.push({
-          id: action.payload.id,
-          name: action.payload.name,
-          price: action.payload.price, // Include price here
-          qty: action.payload.qty,
-          image: action.payload.image,
-        });
-      }
-      localStorage.setItem("cart", JSON.stringify(state.items));
-    },
-    updateItem: (state, action) => {
-      const item = state.items.find((item) => item.id === action.payload.id);
-      if (item) {
-        item.quantity = action.payload.quantity;
-      }
-      localStorage.setItem("cart", JSON.stringify(state.items));
-    },
-
-    clearCart: (state) => {
-      state.items = [];
-      localStorage.removeItem("cart");
-    },
-    setCart: (state, action) => {
-      state.items = action.payload;
-      localStorage.setItem("cart", JSON.stringify(action.payload));
-    },
-    incrementItem: (state, action) => {
-      const item = state.items.find((i) => i.id === action.payload);
-      if (item) item.qty += 1;
-      localStorage.setItem("cart", JSON.stringify(state.items));
-    },
-    decrementItem: (state, action) => {
-      const item = state.items.find((i) => i.id === action.payload);
-      if (item && item.qty > 1) item.qty -= 1;
-      localStorage.setItem("cart", JSON.stringify(state.items));
-    },
-    removeItem: (state, action) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
-      localStorage.setItem("cart", JSON.stringify(state.items));
-    },
-  },
-});
-
-export const {
-  addItem,
-  updateItem,
-  removeItem,
-  clearCart,
-  setCart,
-  decrementItem,
-  incrementItem,
-} = cartSlice.actions;
-export default cartSlice.reducer;
-
-__________
-
-File: src/features/cart/cartApi.js
-------------------------
-// src/features/cart/cartApi.js
-import { api } from "@/store/api/api";
-
-export const cartApi = api.injectEndpoints({
-  endpoints: (builder) => ({
-    getCartItems: builder.query({
-      query: () => "/cart/items",
-      providesTags: ["Cart"],
-      transformResponse: (response) => response.data.cart_items,
-    }),
-    addItemToCart: builder.mutation({
-      query: (data) => ({
-        url: "/cart/add-item",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Cart"],
-    }),
-    increaseItem: builder.mutation({
-      query: (data) => ({
-        url: "/cart/increase-item",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Cart"],
-    }),
-    decreaseItem: builder.mutation({
-      query: (data) => ({
-        url: "/cart/decrease-item",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Cart"],
-    }),
-    removeItem: builder.mutation({
-      query: (data) => ({
-        url: "/cart/remove-item",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Cart"],
-    }),
-    clearCart: builder.mutation({
-      query: () => ({
-        url: "/cart/destroy-cart",
-        method: "POST",
-      }),
-      invalidatesTags: ["Cart"],
-    }),
-  }),
-  overrideExisting: true,
-});
-
-export const {
-  useGetCartItemsQuery,
-  useAddItemToCartMutation,
-  useIncreaseItemMutation,
-  useDecreaseItemMutation,
-  useRemoveItemMutation,
-  useClearCartMutation,
-} = cartApi;
-
-__________
-
-File: src/features/order/orderApi.js
-------------------------
-// src/features/order/orderApi.js
-import { api } from "@/store/api/api";
-
-export const orderApi = api.injectEndpoints({
-  endpoints: (builder) => ({
-    getOrderPrice: builder.query({
-      query: () => "/order/order-price",
-      providesTags: ["Order"],
-    }),
-    createOrder: builder.mutation({
-      query: (data) => ({
-        url: "/order/create",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Cart", "Order"],
-    }),
-  }),
-  overrideExisting: true,
-});
-
-export const { useGetOrderPriceQuery, useCreateOrderMutation } = orderApi;
+  return { separatePart, joinedPart };
+}
 
 __________
 

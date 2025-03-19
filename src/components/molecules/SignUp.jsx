@@ -12,6 +12,8 @@ import { FcGoogle } from "react-icons/fc";
 import { IoIosAt } from "react-icons/io";
 import { CiLock } from "react-icons/ci";
 import { RiUser4Line } from "react-icons/ri";
+import CustomGoogleLoginButton from "@/components/atoms/CustomGoogleLoginButton";
+import {toast} from "sonner";
 // import GoogleLoginButton from "@/components/atoms/GoogleLoginButton";
 
 export default function SignUp({ isPage = true }) {
@@ -29,9 +31,15 @@ export default function SignUp({ isPage = true }) {
   const onSubmit = async (data) => {
     try {
       const res = await registerUser(data).unwrap();
+      if(res.code === 422){
+        return toast.error("it's already registered");
+      }
       dispatch(
         setCredentials({
-          user: res.data,
+          user: {
+            name : res.data.name,
+            image : res.data.image,
+          },
           token: res.data.token,
         }),
       );
@@ -41,21 +49,6 @@ export default function SignUp({ isPage = true }) {
     }
   };
 
-  const handleGoogleSuccess = async (googleData) => {
-    try {
-      const res = await socialLogin(googleData.token).unwrap();
-
-      dispatch(
-        setCredentials({
-          user: res.user,
-          token: res.token,
-        }),
-      );
-      router.push("/");
-    } catch (error) {
-      console.error("Google login failed:", error);
-    }
-  };
 
   return (
     <article className="bg-customLightBg dark:bg-customOrangeBg rounded-3xl min-h-[772px] w-full flex flex-col justify-start items-center gap-8 p-8">
@@ -150,10 +143,11 @@ export default function SignUp({ isPage = true }) {
             <div className="flex-1 border-t border-gray-300"></div>
           </div>
 
-          {/*<GoogleLoginButton onSuccess={handleGoogleSuccess} />*/}
-          <FcGoogle
-            size={48}
-            className="aspect-square rounded-full border-2 p-1"
+          <CustomGoogleLoginButton
+              isPage={isPage}
+              onSuccess={(response) => {
+                console.log("Login response:");
+              }}
           />
         </div>
       </form>

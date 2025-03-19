@@ -6,7 +6,7 @@ export const cartApi = api.injectEndpoints({
     getCartItems: builder.query({
       query: () => "/cart/items",
       providesTags: ["Cart"],
-      transformResponse: (response) => response.data.cart_items,
+      transformResponse: (response) => response?.data?.cart_items || [],
     }),
     addItemToCart: builder.mutation({
       query: (data) => ({
