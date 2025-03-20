@@ -1,5 +1,6 @@
 import SignIn from "@/components/molecules/SignIn";
 import SignUp from "@/components/molecules/SignUp";
+import TapWrap from "@/components/molecules/TapWrap";
 
 export default function Register() {
   return (
@@ -12,11 +13,12 @@ export default function Register() {
           Bringing Your Style Home
         </p>
       </article>
-      <section className="grid grid-cols-2 gap-4 w-full h-full">
+      <section className="hidden lg:grid grid-cols-2 gap-4 w-full h-full">
         <SignIn />
         {/*<article className="bg-red-400 h-full w-full">s</article>*/}
         <SignUp />
       </section>
+      <TapWrap />
     </section>
   );
 }

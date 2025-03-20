@@ -1,10 +1,11 @@
 import fixImageUrl from "@/utils/fixImageUrl";
 import CategoryDetailsPage from "@/components/organisms/CategoryDetailsPage";
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 export const revalidate = 360;
 
 export async function generateStaticParams() {
-  const apiUrl = "https://test-ecomerce.xn--hrt-w-ova.de/api/category/get";
+  const apiUrl = `${process.env.API_BASE_URL}/category/get`;
   try {
     const res = await fetch(apiUrl, {
       headers: {
@@ -29,7 +30,7 @@ export async function generateMetadata({ params, searchParams }) {
   const { id } = await params; // Await params
   const { lang } = await searchParams; // Await searchParams
 
-  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
+  const apiUrl = `${process.env.API_BASE_URL}/category/find/${id}`;
   try {
     const res = await fetch(apiUrl, {
       headers: {
@@ -66,7 +67,7 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 export async function getCategoryData(id, locale) {
-  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/category/find/${id}`;
+  const apiUrl = `${process.env.API_BASE_URL}/category/find/${id}`;
   try {
     const res = await fetch(apiUrl, {
       headers: {

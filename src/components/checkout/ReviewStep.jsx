@@ -25,7 +25,7 @@ export default function ReviewStep({
       </div>
       <div className="flex flex-col-reverse md:flex-row gap-8 w-full">
         <div className="w-full md:px-32">
-          <h3 className="text-xl font-semibold mb-2 uppercase">
+          <h3 className="lg:text-xl text-md font-semibold mb-2 uppercase">
             {t("cartTitle", { count: cartItems.length })}
           </h3>
           <article className="max-h-[645px] min-h-96 overflow-scroll scroll-m-2 bg-customLightBg dark:bg-customOrangeBg rounded-3xl py-8 md:w-full">
@@ -58,12 +58,12 @@ export default function ReviewStep({
           </article>
         </div>
         <div className="mx-auto flex flex-col justify-start items-center w-full gap-8">
-          <div className="flex items-center justify-between md:w-full gap-8">
+          <div className="flex items-center justify-between lg:w-full gap-8">
             <div>
-              <h3 className="text-xl font-semibold mb-2 uppercase">
+              <h3 className="lg:text-xl text-md font-semibold mb-2 uppercase">
                 {t("deliveryTitle")}
               </h3>
-              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
+              <div className="lg:w-[253px] w-[186px] lg:h-[222px] h-[144px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
                 <div className="flex flex-col justify-start items-start gap-1 capitalize">
                   <span>{shippingAddress.city}</span>
                   <span>{shippingAddress.street}</span>
@@ -78,10 +78,10 @@ export default function ReviewStep({
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-2 uppercase">
+              <h3 className="lg:text-xl text-md font-semibold mb-2 uppercase">
                 {t("paymentTitle")}
               </h3>
-              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
+              <div className="lg:w-[253px] w-[186px] lg:h-[222px] h-[144px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
                 <div className="flex justify-start items-start gap-1 capitalize">
                   <span>{paymentMethod}</span>
                   <span>{t("paymentSuffix")}</span>

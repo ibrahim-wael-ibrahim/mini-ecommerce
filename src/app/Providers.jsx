@@ -7,6 +7,7 @@ import { Provider } from "react-redux";
 import { makeStore } from "@/store";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "sonner";
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 export function Providers({ children }) {
   const storeRef = useRef(undefined);
@@ -22,10 +23,10 @@ export function Providers({ children }) {
       <Provider store={storeRef.current}>
         <GoogleOAuthProvider
           authorizationParams={{
-            redirect_uri: "https://test-ecomerce.hrt-wü.de/api/auth/callback",
-            audience: "https://test-ecomerce.hrt-wü.de/api/v2/",
+            redirect_uri: `${process.env.API_BASE_URL}/auth/callback`,
+            audience: `${process.env.API_BASE_URL}/v2/`,
           }}
-          clientId="939457397098-af0i8monehvqgrhr4rad4cvrk93kq1k7.apps.googleusercontent.com"
+          clientId={process.env.GOOGLE_CLIENT_ID}
         >
           {children}
         </GoogleOAuthProvider>

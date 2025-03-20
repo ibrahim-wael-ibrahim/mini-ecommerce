@@ -190,7 +190,6 @@ ______________
 
 src
 ├── app
-│   ├── asdasd.ico
 │   ├── cart
 │   │   └── page.jsx
 │   ├── category
@@ -217,7 +216,6 @@ src
 │   │   ├── CartCounter.jsx
 │   │   ├── CartSync.jsx
 │   │   ├── CustomGoogleLoginButton.jsx
-│   │   ├── GoogleLoginButton.jsx
 │   │   ├── ImageShape.jsx
 │   │   ├── LocaleSwitch.jsx
 │   │   ├── MoreInfo.jsx
@@ -239,7 +237,8 @@ src
 │   │   ├── ProductCard.jsx
 │   │   ├── ProductList.jsx
 │   │   ├── SignIn.jsx
-│   │   └── SignUp.jsx
+│   │   ├── SignUp.jsx
+│   │   └── TapWrap.jsx
 │   └── organisms
 │       ├── CategoryDetailSection.jsx
 │       ├── CategoryDetailsPage.jsx
@@ -298,7 +297,7 @@ src
     ├── getFormattedPrice.js
     └── productTitle.js
 
-30 directories, 79 files
+30 directories, 78 files
 
 ======= Appending src file contents =======
 
@@ -405,6 +404,8 @@ export default function CartPage() {
           ))}
       </article>
       <div className="flex flex-col justify-end items-center gap-6 w-full py-10">
+        <div className="w-full border-t dark:border-gray-300 border-gray-600"></div>
+
         <div className="w-full flex justify-between items-center font-extrabold capitalize">
           <span>{t("total")}</span>
           <span>
@@ -650,7 +651,7 @@ const CheckoutController = () => {
             <ProgressIndicator currentStep={currentStep} />
             <div className="flex flex-col justify-start items-center w-full gap-2">
               <span className="w-full min-h-[0.1px] bg-customControlBg/60 mb-8" />
-              <h1 className="text-5xl font-extrabold capitalize">
+              <h1 className="lg:text-5xl text-3xl font-extrabold capitalize">
                 {t("checkoutController.title")}
               </h1>
               <p className="opacity-60 capitalize">
@@ -955,6 +956,7 @@ File: src/app/register/page.jsx
 ------------------------
 import SignIn from "@/components/molecules/SignIn";
 import SignUp from "@/components/molecules/SignUp";
+import TapWrap from "@/components/molecules/TapWrap";
 
 export default function Register() {
   return (
@@ -967,11 +969,12 @@ export default function Register() {
           Bringing Your Style Home
         </p>
       </article>
-      <section className="grid grid-cols-2 gap-4 w-full h-full">
+      <section className="hidden lg:grid grid-cols-2 gap-4 w-full h-full">
         <SignIn />
         {/*<article className="bg-red-400 h-full w-full">s</article>*/}
         <SignUp />
       </section>
+      <TapWrap />
     </section>
   );
 }
@@ -1067,7 +1070,9 @@ export default function BlobShape({
   className,
 }) {
   return (
-    <div className={`absolute ${dirY} ${dirX}-0 w-[330px] ${className} -z-[1]`}>
+    <div
+      className={`absolute ${dirY} ${dirX}-0 xl:w-[330px] w-[100px] ${className} -z-[1]`}
+    >
       <Image
         src={PathSvg}
         width={0}
@@ -1324,32 +1329,6 @@ export default function CartSync() {
   }, [token]);
 
   return null; // No UI rendering needed
-}
-
-__________
-
-File: src/components/atoms/GoogleLoginButton.jsx
-------------------------
-// src/components/atoms/GoogleLoginButton.jsx
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
-
-export default function GoogleLoginButton({ onSuccess }) {
-  return (
-    <GoogleLogin
-      onSuccess={(credentialResponse) => {
-        const decoded = jwtDecode(credentialResponse.credential);
-        onSuccess({
-          token: credentialResponse.credential,
-          email: decoded.email,
-          firstName: decoded.given_name,
-          lastName: decoded.family_name,
-        });
-      }}
-      onError={() => console.log("Login Failed")}
-      useOneTap
-    />
-  );
 }
 
 __________
@@ -1780,7 +1759,7 @@ export default function ProgressIndicator({ currentStep }) {
   ];
 
   return (
-    <div className="flex justify-center items-center mb-6 w-full">
+    <div className="flex justify-center items-center mb-6 mx-2 w-full">
       {steps.map(({ step, title }) => (
         <button
           key={step}
@@ -1794,13 +1773,13 @@ export default function ProgressIndicator({ currentStep }) {
           >
             <span>
               {currentStep > step ? (
-                <FaCircleCheck size={32} className="text-customGreenS" />
+                <FaCircleCheck className="text-customGreenS lg:text-2xl" />
               ) : (
-                <FaRegCircle size={32} className="text-customBlue" />
+                <FaRegCircle className="text-customBlue lg:text-2xl " />
               )}
             </span>
             <span
-              className={`uppercase font-extrabold mx-1 ${
+              className={`uppercase text-sm lg:text-2xl font-extrabold mx-1 ${
                 currentStep > step
                   ? "text-black"
                   : currentStep === step
@@ -1813,7 +1792,7 @@ export default function ProgressIndicator({ currentStep }) {
           </div>
           {step < 4 && (
             <div
-              className={`h-px md:min-w-[173px] min-w-[40px] ${
+              className={`h-px lg:min-w-[173px] min-w-[32px] ${
                 currentStep >= step ? "bg-customGreenW" : "bg-customControlBg"
               }`}
             ></div>
@@ -1855,7 +1834,7 @@ export default function ReviewStep({
       </div>
       <div className="flex flex-col-reverse md:flex-row gap-8 w-full">
         <div className="w-full md:px-32">
-          <h3 className="text-xl font-semibold mb-2 uppercase">
+          <h3 className="lg:text-xl text-md font-semibold mb-2 uppercase">
             {t("cartTitle", { count: cartItems.length })}
           </h3>
           <article className="max-h-[645px] min-h-96 overflow-scroll scroll-m-2 bg-customLightBg dark:bg-customOrangeBg rounded-3xl py-8 md:w-full">
@@ -1888,12 +1867,12 @@ export default function ReviewStep({
           </article>
         </div>
         <div className="mx-auto flex flex-col justify-start items-center w-full gap-8">
-          <div className="flex items-center justify-between md:w-full gap-8">
+          <div className="flex items-center justify-between lg:w-full gap-8">
             <div>
-              <h3 className="text-xl font-semibold mb-2 uppercase">
+              <h3 className="lg:text-xl text-md font-semibold mb-2 uppercase">
                 {t("deliveryTitle")}
               </h3>
-              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
+              <div className="lg:w-[253px] w-[186px] lg:h-[222px] h-[144px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
                 <div className="flex flex-col justify-start items-start gap-1 capitalize">
                   <span>{shippingAddress.city}</span>
                   <span>{shippingAddress.street}</span>
@@ -1908,10 +1887,10 @@ export default function ReviewStep({
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-2 uppercase">
+              <h3 className="lg:text-xl text-md font-semibold mb-2 uppercase">
                 {t("paymentTitle")}
               </h3>
-              <div className="w-[253px] h-[222px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
+              <div className="lg:w-[253px] w-[186px] lg:h-[222px] h-[144px] bg-customLightBg dark:bg-customOrangeBg rounded-3xl flex flex-col justify-between items-start p-4">
                 <div className="flex justify-start items-start gap-1 capitalize">
                   <span>{paymentMethod}</span>
                   <span>{t("paymentSuffix")}</span>
@@ -2215,44 +2194,46 @@ export default function Footer() {
 
   return (
     <footer className="relative mt-6 w-full bg-customLightBg dark:bg-customOrangeBg flex flex-col flex-wrap justify-between items-center py-10 px-4 md:px-32 gap-12">
-      <article className="relative min-h-8/12 w-8/12 grid grid-rows-4 md:flex justify-between items-center gap-8 py-20">
+      <article className="relative min-h-8/12 w-10/12 xl:w-8/12 flex flex-col xl:flex-row md:flex justify-start items-start xl:justify-between xl:items-center gap-8 py-20">
         <div className="flex flex-col justify-center items-start gap-8">
           <h1 className="font-extrabold text-2xl">{t("logo")}</h1>
           <p className="w-[293px] text-[15px] font-normal">
             {t("description")}
           </p>
         </div>
-        <div className="flex flex-col justify-center items-start gap-4">
-          <h1 className="font-bold capitalize text-customOrange">
-            {t("services.title")}
-          </h1>
-          <span>{t("services.emailMarketing")}</span>
-          <span>{t("services.campaigns")}</span>
-          <span>{t("services.branding")}</span>
-        </div>
-        <div className="flex flex-col justify-center items-start gap-4">
-          <h1 className="font-bold capitalize text-customOrange">
-            {t("furniture.title")}
-          </h1>
-          <span>{t("furniture.beds")}</span>
-          <span>{t("furniture.chair")}</span>
-          <span>{t("furniture.all")}</span>
-        </div>
-        <div className="flex flex-col justify-center items-start gap-4">
-          <h1 className="font-bold capitalize text-customOrange">
-            {t("followUs.title")}
-          </h1>
-          <div className="flex items-center gap-4">
-            <FaFacebookF />
-            <span>{t("followUs.facebook")}</span>
+        <div className="w-full flex xl:justify-evenly justify-start  gap-16 flex-wrap">
+          <div className="flex flex-col justify-center items-start gap-4">
+            <h1 className="font-bold capitalize text-customOrange">
+              {t("services.title")}
+            </h1>
+            <span>{t("services.emailMarketing")}</span>
+            <span>{t("services.campaigns")}</span>
+            <span>{t("services.branding")}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <FaTwitter />
-            <span>{t("followUs.twitter")}</span>
+          <div className="flex flex-col justify-center items-start gap-4">
+            <h1 className="font-bold capitalize text-customOrange">
+              {t("furniture.title")}
+            </h1>
+            <span>{t("furniture.beds")}</span>
+            <span>{t("furniture.chair")}</span>
+            <span>{t("furniture.all")}</span>
           </div>
-          <div className="flex items-center gap-4">
-            <FaInstagram />
-            <span>{t("followUs.instagram")}</span>
+          <div className="flex flex-col justify-center items-start gap-4">
+            <h1 className="font-bold capitalize text-customOrange">
+              {t("followUs.title")}
+            </h1>
+            <div className="flex items-center gap-4">
+              <FaFacebookF />
+              <span>{t("followUs.facebook")}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <FaTwitter />
+              <span>{t("followUs.twitter")}</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <FaInstagram />
+              <span>{t("followUs.instagram")}</span>
+            </div>
           </div>
         </div>
       </article>
@@ -2295,13 +2276,16 @@ export default function Navbar() {
     <div
       className={`fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
     >
-      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14 ">
-        <Link href="/">
-          <span className="flex  font-agency uppercase font-bold text-2xl">
-            {t("navbar.logo")}
-          </span>
-        </Link>
-        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  w-full">
+      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14  ">
+        <div className="w-3/6">
+          <Link href="/">
+            <span className="flex  font-agency uppercase font-bold text-2xl ">
+              {t("navbar.logo")}
+            </span>
+          </Link>
+        </div>
+
+        <nav className=" items-center justify-center sm:mt-0 gap-4 hidden md:flex  mx-auto w-full">
           {navLinks.map((link) => (
             <Link
               key={link.url}
@@ -2362,8 +2346,8 @@ export default function ProductCard({ product }) {
   );
   return (
     <Link href={`/product/${product.id}?lang=${locale}`}>
-      <article className="relative w-[268px] h-[441px] flex items-start justify-center flex-col rounded-2xl  ">
-        <div className=" relative min-h-[268px] min-w-full  bg-customLightBg dark:bg-customOrangeBg rounded-t-3xl flex justify-center items-center  ">
+      <article className="relative xl:w-[268px] xl:h-[441px] flex items-start justify-center flex-col rounded-2xl  ">
+        <div className=" relative xl:min-h-[268px] min-w-full  bg-customLightBg dark:bg-customOrangeBg rounded-t-3xl flex justify-center items-center  ">
           {parseFloat(product.discount) > 0 && (
             <span className="h-[23px] w-[49px] rounded-[40px] font-extrabold bg-customOrange text-center absolute top-3 left-3 rtl:right-3">
               {parseFloat(product.discount)}%
@@ -2374,7 +2358,7 @@ export default function ProductCard({ product }) {
             height={256}
             src={fixImageUrl(product.productimage[0].link)}
             alt={product.title}
-            className="-mt-20"
+            className="xl:-mt-20 -mt-12"
           />
         </div>
         <div className=" flex flex-col justify-between items-start p-4 w-full h-full">
@@ -2435,7 +2419,7 @@ export default function ProductList({ categoryId }) {
   } = useGetProductsByCategoryQuery({ categoryId, locale });
   if (isLoading) return <div>load...</div>;
   return (
-    <section className="min-h-dvh relative grid grid-cols-1 md:grid-cols-4 gap-28 justify-items-center w-full mt-20 py-20 mx-auto  ">
+    <section className="min-h-dvh relative grid grid-cols-2 md:grid-cols-4 gap-28 justify-items-center w-full mt-20 py-20 mx-auto  ">
       {products &&
         products.length > 0 &&
         products.map((product, index) => (
@@ -2699,6 +2683,22 @@ export default function SignUp({ isPage = true }) {
 
 __________
 
+File: src/components/molecules/TapWrap.jsx
+------------------------
+export default function TapWrap() {
+  return (
+    <section className="w-full h-full flex flex-col justify-start items-center">
+      <article className="w-full grid grid-cols-2 grid-rows-1 ">
+        <button className="text-2xl font-normal p-2 border-b-2  border-customOrange dark:bg-customOrangeBg bg-customOrange w-full">
+          Sign in
+        </button>
+      </article>
+    </section>
+  );
+}
+
+__________
+
 File: src/components/organisms/CategoryDetailSection.jsx
 ------------------------
 "use client";
@@ -2898,15 +2898,19 @@ export default function HomeDreamSection() {
 
   return (
     <section className="relative min-h-[70dvh] w-full flex flex-wrap justify-evenly items-center gap-8  ">
-      <BlobShape PathSvg="/images/blob/BLOB_1.svg" dirX="left" />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_1.svg"
+        dirX="left"
+        className="hidden xl:block"
+      />
 
       <ImageShape
         id="dream"
         alt="dream image"
         image="/images/IMAGE_DREAM.png"
       />
-      <article className="relative flex flex-col justify-center items-start gap-8">
-        <h1 className="text-5xl font-extrabold  mb-4">
+      <article className=" relative flex flex-col justify-center items-start gap-8 px-4">
+        <h1 className="text-3xl xl:text-5xl font-extrabold  mb-4">
           {t("dreamSection.title")
             .split("\n")
             .map((line, index, arr) => (
@@ -2916,7 +2920,9 @@ export default function HomeDreamSection() {
               </React.Fragment>
             ))}
         </h1>
-        <p className="w-[500px] opacity-60">{t("dreamSection.description")}</p>
+        <p className=" xl:w-[500px] opacity-60 ">
+          {t("dreamSection.description")}
+        </p>
         <MoreInfo link="test" />
       </article>
     </section>
@@ -2961,15 +2967,21 @@ export default function HomeFeaturesSection() {
         PathSvg="/images/blob/BLOB_3.svg"
         dirX="left"
         dirY="bottom-0"
+        className="hidden xl:block"
       />
-      <BlobShape PathSvg="/images/blob/BLOB_2.svg" dirX="right" dirY="top-18" />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_2.svg"
+        dirX="right"
+        dirY="top-18"
+        className="hidden xl:block"
+      />
       <span className="uppercase text-customOrange text-xl">
         {t("homeFeaturesSection.subtitle")}
       </span>
-      <h1 className="capitalize text-5xl font-extrabold">
+      <h1 className="capitalize text-center xl:text-left xl:rtl:text-right  text-3xl xl:text-5xl font-extrabold px-8">
         {t("homeFeaturesSection.title")}
       </h1>
-      <div className="relative flex flex-wrap justify-center items-center mt-5 gap-32">
+      <div className="relative flex overflow-x-scroll justify-center items-center mt-5 gap-32">
         {features.map((feature) => (
           <FeatureCard
             key={feature.id}
@@ -3132,7 +3144,7 @@ function ProductDetailsPage({ params, initialProduct }) {
   );
 
   return (
-    <section className="min-h-[80dvh] p-8 my-32 flex flex-col justify-center items-start container mx-auto">
+    <section className="lg:min-h-[80dvh] p-8 my-32 flex flex-col justify-center items-start container mx-auto">
       <div className="flex flex-col justify-center items-start gap-8 mb-10">
         <Link
           href={`/category/${product.categories[0].id}?lang=${locale}`}
@@ -3149,11 +3161,11 @@ function ProductDetailsPage({ params, initialProduct }) {
         </div>
       </div>
       <section
-        className={`min-h-[60dvh] container transition-opacity duration-500 ${
+        className={` container transition-opacity duration-500 ${
           isMounted ? "opacity-100" : "opacity-0"
-        } grid md:grid-cols-2 gap-8`}
+        } grid grid-cols-1 lg:grid-cols-2 gap-8  `}
       >
-        <article className="w-full h-full grid grid-cols-2 grid-rows-2 place-content-center gap-1">
+        <article className="w-full lg:h-full h-4/6 grid grid-cols-2 grid-rows-2 place-content-center gap-1">
           <div className="w-full h-full col-span-2 bg-customLightBg dark:bg-customOrangeBg">
             <Image
               src={fixImageUrl(product.productimage[0].link)}
@@ -3169,7 +3181,7 @@ function ProductDetailsPage({ params, initialProduct }) {
               alt={product.title}
               width={400}
               height={400}
-              className="scale-[1.20] absolute -top-28 left-4"
+              className="scale-[1.20] absolute lg:-top-28 -top-16 left-4"
             />
           </div>
           <div className="relative bg-customLightBg dark:bg-customOrangeBg overflow-hidden">
@@ -3178,7 +3190,7 @@ function ProductDetailsPage({ params, initialProduct }) {
               alt={product.title}
               width={800}
               height={400}
-              className="absolute scale-[2] -bottom-24 -left-[4.2rem] object-fill"
+              className="absolute scale-[2] -bottom-24  -left-[4.2rem] lg:object-fill object-contain"
             />
           </div>
         </article>

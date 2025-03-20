@@ -1,12 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 // Define API base URL
-const baseUrl = "https://test-ecomerce.xn--hrt-w-ova.de/api";
+// const baseUrl = "https://test-ecomerce.xn--hrt-w-ova.de/api";
 
 export const api = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl,
+    baseUrl: process.env.API_BASE_URL,
     prepareHeaders: (headers, { getState }) => {
       const token = getState().auth.token;
       const locale = getState().locale.locale;

@@ -117,7 +117,7 @@ const CheckoutController = () => {
             <ProgressIndicator currentStep={currentStep} />
             <div className="flex flex-col justify-start items-center w-full gap-2">
               <span className="w-full min-h-[0.1px] bg-customControlBg/60 mb-8" />
-              <h1 className="text-5xl font-extrabold capitalize">
+              <h1 className="lg:text-5xl text-3xl font-extrabold capitalize">
                 {t("checkoutController.title")}
               </h1>
               <p className="opacity-60 capitalize">

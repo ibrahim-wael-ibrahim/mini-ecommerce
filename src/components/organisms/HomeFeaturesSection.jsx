@@ -32,15 +32,21 @@ export default function HomeFeaturesSection() {
         PathSvg="/images/blob/BLOB_3.svg"
         dirX="left"
         dirY="bottom-0"
+        className="hidden xl:block"
       />
-      <BlobShape PathSvg="/images/blob/BLOB_2.svg" dirX="right" dirY="top-18" />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_2.svg"
+        dirX="right"
+        dirY="top-18"
+        className="hidden xl:block"
+      />
       <span className="uppercase text-customOrange text-xl">
         {t("homeFeaturesSection.subtitle")}
       </span>
-      <h1 className="capitalize text-5xl font-extrabold">
+      <h1 className="capitalize text-center xl:text-left xl:rtl:text-right  text-3xl xl:text-5xl font-extrabold px-8">
         {t("homeFeaturesSection.title")}
       </h1>
-      <div className="relative flex flex-wrap justify-center items-center mt-5 gap-32">
+      <div className="relative flex overflow-x-scroll justify-center items-center mt-5 gap-32">
         {features.map((feature) => (
           <FeatureCard
             key={feature.id}

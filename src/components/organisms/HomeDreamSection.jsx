@@ -10,15 +10,19 @@ export default function HomeDreamSection() {
 
   return (
     <section className="relative min-h-[70dvh] w-full flex flex-wrap justify-evenly items-center gap-8  ">
-      <BlobShape PathSvg="/images/blob/BLOB_1.svg" dirX="left" />
+      <BlobShape
+        PathSvg="/images/blob/BLOB_1.svg"
+        dirX="left"
+        className="hidden xl:block"
+      />
 
       <ImageShape
         id="dream"
         alt="dream image"
         image="/images/IMAGE_DREAM.png"
       />
-      <article className="relative flex flex-col justify-center items-start gap-8">
-        <h1 className="text-5xl font-extrabold  mb-4">
+      <article className=" relative flex flex-col justify-center items-start gap-8 px-4">
+        <h1 className="text-3xl xl:text-5xl font-extrabold  mb-4">
           {t("dreamSection.title")
             .split("\n")
             .map((line, index, arr) => (
@@ -28,7 +32,9 @@ export default function HomeDreamSection() {
               </React.Fragment>
             ))}
         </h1>
-        <p className="w-[500px] opacity-60">{t("dreamSection.description")}</p>
+        <p className=" xl:w-[500px] opacity-60 ">
+          {t("dreamSection.description")}
+        </p>
         <MoreInfo link="test" />
       </article>
     </section>

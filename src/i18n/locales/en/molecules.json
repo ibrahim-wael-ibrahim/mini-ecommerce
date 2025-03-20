@@ -15,5 +15,7 @@
       "lightMode": "Light Mode",
       "darkMode": "Dark Mode"
     }
-  }
+  },
+  "signinTabLabel": "Sign In",
+  "signupTabLabel": "Sign Up"
 }

@@ -15,5 +15,7 @@
       "lightMode": "الوضع الفاتح",
       "darkMode": "الوضع الداكن"
     }
-  }
+  },
+  "signinTabLabel": "تسجيل الدخول",
+  "signupTabLabel": "إنشاء حساب"
 }

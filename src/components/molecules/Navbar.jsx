@@ -22,7 +22,7 @@ export default function Navbar() {
     <div
       className={`fixed inset-x-0 top-4 z-50 h-16 border-none transition-all duration-700 sm:inset-x-6  ${pathname === "/" ? "text-white" : ""}`}
     >
-      <header className="absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center mx-4 md:mx-14  ">
+      <header className="ScrollNavbar absolute top-1/2 w-[90dvw] -translate-y-1/2  flex justify-between items-center px-4 py-2 rounded-md mx-4 md:mx-14  ">
         <div className="w-3/6">
           <Link href="/">
             <span className="flex  font-agency uppercase font-bold text-2xl ">

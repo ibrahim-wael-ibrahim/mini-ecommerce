@@ -11,7 +11,7 @@ export async function generateMetadata({ params, searchParams }) {
   const { id } = await params; // Await params
   const { lang } = await searchParams; // Await searchParams
 
-  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/product/find/${id}`;
+  const apiUrl = `${process.env.API_BASE_URL}/product/find/${id}`;
   try {
     const res = await fetch(apiUrl, {
       headers: {
@@ -63,7 +63,7 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 export async function getProductData(id, locale) {
-  const apiUrl = `https://test-ecomerce.xn--hrt-w-ova.de/api/product/find/${id}`;
+  const apiUrl = `${process.env.API_BASE_URL}/product/find/${id}`;
   try {
     const res = await fetch(apiUrl, {
       headers: {

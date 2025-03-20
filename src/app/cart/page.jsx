@@ -58,6 +58,8 @@ export default function CartPage() {
           ))}
       </article>
       <div className="flex flex-col justify-end items-center gap-6 w-full py-10">
+        <div className="w-full border-t dark:border-gray-300 border-gray-600"></div>
+
         <div className="w-full flex justify-between items-center font-extrabold capitalize">
           <span>{t("total")}</span>
           <span>

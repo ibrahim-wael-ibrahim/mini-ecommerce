@@ -15,8 +15,8 @@ export default function ProductCard({ product }) {
   );
   return (
     <Link href={`/product/${product.id}?lang=${locale}`}>
-      <article className="relative w-[268px] h-[441px] flex items-start justify-center flex-col rounded-2xl  ">
-        <div className=" relative min-h-[268px] min-w-full  bg-customLightBg dark:bg-customOrangeBg rounded-t-3xl flex justify-center items-center  ">
+      <article className="relative xl:w-[268px] xl:h-[441px] flex items-start justify-center flex-col rounded-2xl  ">
+        <div className=" relative xl:min-h-[268px] min-w-full  bg-customLightBg dark:bg-customOrangeBg rounded-t-3xl flex justify-center items-center  ">
           {parseFloat(product.discount) > 0 && (
             <span className="h-[23px] w-[49px] rounded-[40px] font-extrabold bg-customOrange text-center absolute top-3 left-3 rtl:right-3">
               {parseFloat(product.discount)}%
@@ -27,7 +27,7 @@ export default function ProductCard({ product }) {
             height={256}
             src={fixImageUrl(product.productimage[0].link)}
             alt={product.title}
-            className="-mt-20"
+            className="xl:-mt-20 -mt-12"
           />
         </div>
         <div className=" flex flex-col justify-between items-start p-4 w-full h-full">

@@ -21,12 +21,12 @@ export default function SignIn({ isPage = true }) {
   const onSubmit = async (data) => {
     try {
       const res = await login(data).unwrap();
-console.log(res);
+      console.log(res);
       dispatch(
         setCredentials({
           user: {
             name: `${res.data.name} ${res.data.lastname}`,
-            image : res.data.image,
+            image: res.data.image,
           },
           token: res.data.token,
         }),
@@ -44,9 +44,9 @@ console.log(res);
       </h1>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col justify-between items-center  gap-8 p-4 mt-8 h-full w-full"
+        className="flex flex-col justify-between h-full  gap-8  mt-8  w-full"
       >
-        <div className="w-full space-y-4">
+        <div className="w-full h-full space-y-4">
           <div className="flex items-center gap-2 w-full">
             <IoIosAt size={24} />
             <input

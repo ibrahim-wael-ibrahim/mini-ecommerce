@@ -14,7 +14,7 @@ export default function ProgressIndicator({ currentStep }) {
   ];
 
   return (
-    <div className="flex justify-center items-center mb-6 w-full">
+    <div className="flex justify-center items-center mb-6 mx-2 w-full">
       {steps.map(({ step, title }) => (
         <button
           key={step}
@@ -28,13 +28,13 @@ export default function ProgressIndicator({ currentStep }) {
           >
             <span>
               {currentStep > step ? (
-                <FaCircleCheck size={32} className="text-customGreenS" />
+                <FaCircleCheck className="text-customGreenS lg:text-2xl" />
               ) : (
-                <FaRegCircle size={32} className="text-customBlue" />
+                <FaRegCircle className="text-customBlue lg:text-2xl " />
               )}
             </span>
             <span
-              className={`uppercase font-extrabold mx-1 ${
+              className={`uppercase text-sm lg:text-2xl font-extrabold mx-1 ${
                 currentStep > step
                   ? "text-black"
                   : currentStep === step
@@ -47,7 +47,7 @@ export default function ProgressIndicator({ currentStep }) {
           </div>
           {step < 4 && (
             <div
-              className={`h-px md:min-w-[173px] min-w-[40px] ${
+              className={`h-px lg:min-w-[173px] min-w-[32px] ${
                 currentStep >= step ? "bg-customGreenW" : "bg-customControlBg"
               }`}
             ></div>

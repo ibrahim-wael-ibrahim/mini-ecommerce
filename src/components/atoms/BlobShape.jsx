@@ -7,7 +7,9 @@ export default function BlobShape({
   className,
 }) {
   return (
-    <div className={`absolute ${dirY} ${dirX}-0 w-[330px] ${className} -z-[1]`}>
+    <div
+      className={`absolute ${dirY} ${dirX}-0 xl:w-[330px] w-[100px] ${className} -z-[1]`}
+    >
       <Image
         src={PathSvg}
         width={0}

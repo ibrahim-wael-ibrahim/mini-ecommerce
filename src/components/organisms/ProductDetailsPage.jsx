@@ -93,7 +93,7 @@ function ProductDetailsPage({ params, initialProduct }) {
   );
 
   return (
-    <section className="min-h-[80dvh] p-8 my-32 flex flex-col justify-center items-start container mx-auto">
+    <section className="lg:min-h-[80dvh] p-8 my-32 flex flex-col justify-center items-start container mx-auto">
       <div className="flex flex-col justify-center items-start gap-8 mb-10">
         <Link
           href={`/category/${product.categories[0].id}?lang=${locale}`}
@@ -110,11 +110,11 @@ function ProductDetailsPage({ params, initialProduct }) {
         </div>
       </div>
       <section
-        className={`min-h-[60dvh] container transition-opacity duration-500 ${
+        className={` container transition-opacity duration-500 ${
           isMounted ? "opacity-100" : "opacity-0"
-        } grid md:grid-cols-2 gap-8`}
+        } grid grid-cols-1 lg:grid-cols-2 gap-8  `}
       >
-        <article className="w-full h-full grid grid-cols-2 grid-rows-2 place-content-center gap-1">
+        <article className="w-full lg:h-full h-4/6 grid grid-cols-2 grid-rows-2 place-content-center gap-1">
           <div className="w-full h-full col-span-2 bg-customLightBg dark:bg-customOrangeBg">
             <Image
               src={fixImageUrl(product.productimage[0].link)}
@@ -130,7 +130,7 @@ function ProductDetailsPage({ params, initialProduct }) {
               alt={product.title}
               width={400}
               height={400}
-              className="scale-[1.20] absolute -top-28 left-4"
+              className="scale-[1.20] absolute lg:-top-28 -top-16 left-4"
             />
           </div>
           <div className="relative bg-customLightBg dark:bg-customOrangeBg overflow-hidden">
@@ -139,7 +139,7 @@ function ProductDetailsPage({ params, initialProduct }) {
               alt={product.title}
               width={800}
               height={400}
-              className="absolute scale-[2] -bottom-24 -left-[4.2rem] object-fill"
+              className="absolute scale-[2] -bottom-24  -left-[4.2rem] lg:object-fill object-contain"
             />
           </div>
         </article>
